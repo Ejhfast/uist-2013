@@ -195,31 +195,24 @@ In figure 0 we show DeduceIt's Ruleset creation view.
 
 \subsubsection{Sharing Rewrite Languages}
 
-Many rewrite languages are common enough that it makes sense for them to be shared among different assignments: for instance, languages which describe basic algebraic manipulation, predicate logic, or the expansion of regular expressions. DeduceIt allows instructors to reuse a rewrite language across assignments, once it has already been defined.
+Some rewrite languages are common enough that it makes sense to share them among different assignments: for instance, many assignments might use the languages defined for basic algebraic manipulation, predicate logic, or the expansion of regular expressions. DeduceIt allows instructors to reuse a rewrite language across assignments.
 
 \subsubsection{The Assignment Proof Tree}
 
-For each assignment, an instructor has real-time access to its proof tree. This tree tracks the history of all derivations associated with the assignment. These derivations share a common root node, and each step in a derivation maps to one of its children, the immediate parent of which is either the root node itself or else a node associated with the previously derived step. Every node maintains the details associated with its step as well as frequency information: a simple count of how many derivations have traversed it. The instructor may annotate any node in the tree with optional hints, and these will be visible to a student if she enters upon that path in her own derivation. An instructor may also override the behavior of the underlying derivation checker (e.g. forcibly label a given derivation step valid). This can be useful for nodes which make use of particularly long chains of free rules which can't be discovered and verified by proof search.
+For each assignment, an instructor has real-time access to its proof tree. This tree tracks the history of all derivations associated with the assignment. These derivations share a common root node, and each step in a derivation maps to one of its children, the immediate parent of which is either the root node itself or else a node associated with the previously derived step. Every node keeps track of derivation state information and a count of how many students have traversed it. An instructor may annotate any node in the tree with hints, and these will be visible to a student if she enters upon that path in her own derivation. An instructor may also use this tree to override the behavior of the underlying derivation checker, e.g. forcibly label a given derivation step valid. This can be useful for steps which make use of particularly long chains of free rules which can't be discovered and verified by proof search.
 
 
 \subsection{The student view}
 
+An assignment's student view presents the information we have already encountered on the instructor interface. At the top of the page a title, goal, and description broadly introduce the exercise at hand. Below these are the given expressions---a student uses one or more of these to start the derivation---and some number of rulesets divided into two types: required and free. Rulesets may be (and usually are) composed of many separate rewrite rules, but an assignment presents them as single, discrete entities; students need not be familiar with rewriting systems to use DeduceIt. In fact, the term `rewrite' cannot be found anywhere on the student view, and these rulesets are themselves labeled on the page simply as `rules'. This might create a leaky abstraction if rulesets are not carefully specified (i.e. the instructor description does not exactly match the behavior specified by the underlying rewrites), but most students are not familiar with rewrite rules, and we have discovered that a small sacrifice of precision in the rules positively impacts usability, as reported by several students.
 
-\subsection{The student view}
+\subsubsection{Interacting with a Derivation}
 
-Every submission should begin with an abstract of about 150 words,
-followed by a set of keywords. The abstract and keywords should be
-placed in the left column of the first page under the left half of the
-title. The abstract should be a concise statement of the problem,
-approach and conclusions of the work described.  It should clearly
-state the paper's contribution to the field of HCI.
+Each assignment page contains an interactive derivation. Before a student has made progress in an assignment this derivation consists of only three empty input fields which are labeled: conclusion, rule, and givens. To more forward in a derivation, a student must derive a conclusion by applying the selected rule on the selected givens(s). 
 
-The first set of keywords will be used to index the paper in the
-proceedings. The second set are used to catalogue the paper in the ACM
-Digital Library. The latter are entries from the ACM Classification
-System~\cite{acm_categories}.  In general, it should only be necessary
-to pick one or more of the H5 subcategories, see
-\url{http://www.acm.org/class/1998/ccs98.html}
+This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or which are members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constrains eliminate the possibility of many simple mistakes, like mistypings, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
+
+To verify the current state of a derivation, students must click on the button ``Update Proof." DeduceIt will respond with one of several kinds of feedback: if the derivation is valid so far, all steps will turn green; if it cannot parse the conclusion of some step in the derivation, that step will turn yellow; or if it can parse but not prove the conclusion of some step in the derivation, that step will turn red. Each valid step preceding an invalid step will remain green, and if an invalid step has a hint annotation on the assignment Proof Tree, an optional hint will adjacent to that step. If the conclusion of the latest step is equivalent to the goal expression, DeduceIt signals that the assignment is finished and does not prompt a new step in the derivation.
 
 \subsection{Normal or Body Text}
 
