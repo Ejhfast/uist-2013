@@ -67,7 +67,7 @@ breaklinks=true,
 \author{
   \alignauthor Ethan Fast, Colleen Lee, Daphne Koller, Michael Bernstein, Alex Aiken\\
     \affaddr{Stanford University}\\
-    \email{\{ethanfast, clee0, koller, aiken, msb\}@cs.stanford.edu}\\
+    \email{\{ethan.fast, clee0, koller, aiken, msb\}@cs.stanford.edu}\\
 }
 
 \maketitle
@@ -212,7 +212,43 @@ Each assignment page contains an interactive derivation. Before a student has ma
 
 This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or which are members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constrains eliminate the possibility of many simple mistakes, like mistypings, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
 
-To verify the current state of a derivation, students must click on the button ``Update Proof." DeduceIt will respond with one of several kinds of feedback: if the derivation is valid so far, all steps will turn green; if it cannot parse the conclusion of some step in the derivation, that step will turn yellow; or if it can parse but not prove the conclusion of some step in the derivation, that step will turn red. Each valid step preceding an invalid step will remain green, and if an invalid step has a hint annotation on the assignment Proof Tree, an optional hint will adjacent to that step. If the conclusion of the latest step is equivalent to the goal expression, DeduceIt signals that the assignment is finished and does not prompt a new step in the derivation.
+To verify the current state of a derivation, students must click on the button ``Update Proof." DeduceIt will respond with one of several kinds of feedback: if the derivation is so far valid, all its steps will turn green; if the system cannot parse the conclusion of some step in the derivation, that step will turn yellow; or if the system can parse but not prove the conclusion of some step in the derivation, that step will turn red. Each valid step preceding an invalid step will remain green, and if an invalid step has any hint annotations on the assignment Proof Tree, hints appear adjacent to that step. Hints take the form of a styled question mark, which expands into text on mouseover. Finally, if the conclusion of the latest step is equivalent to the goal expression, DeduceIt signals the assignment is finished with a large checkmark and does not prompt a new step in the derivation.
+
+\subsection{Extensions to the Derivation Interface}
+
+We experimented with several other forms of derivation feedback which we have not yet deployed for our on-line class.
+
+\subsubsection{Surfacing the Proof Path}
+
+DeduceIt maintains aggregate data about every derivation, so the system knows when students are proceeding down well-traveled paths in a derivation, or down correct but---so far---more lengthy paths, or down paths which have not yet led to the goal. One version of DeduceIt surfaces this information with a status indicator, a colored circle of green, yellow, or orange at the top of the derivation, indicating whether students are on a common path, an uncommon but successful path, or an as yet unsuccessful path. 
+
+From anecdotal feedback, it seems students find this indicator helpful, and in theory DeduceIt could provide students even finer grain information: the exact number of other successful or unsuccessful students who have worked to the current state of their derivation; or detection of the exact step in their derivation where they left the well-traveled path. It is also possible to further process the Proof Tree. By collapsing some nodes which are syntactically different but semantically equivalent (e.g. the expressions $(1+2)+3$ and $1+(2+3)$ in a calculus assignment) DeduceIt could construct a more meaningful notion of a derivation path.
+
+\subsubsection{Providing Automatic Hints}
+
+DeduceIt allows instructors to set up hints for any derivation step by annotating an assignment's proof tree. However, we built another version of DeduceIt that constructs these hints automatically using proof search. In this second implementation, DeduceIt holds the rule and assumption fields constant and searches for alternative valid conclusions. 
+
+For instance, suppose a student enters $x=3+1$, \textit{Balance Equation}, and $x+1=3$ in the respective fields for conclusion, rule, and assumptions. This is an incorrect step, so DeduceIt will highlight it in red. And in the standard version of DeduceIt, if an instructor has not annotated this step on the proof tree, this is all the system will do. The student will not be given any further direction; she knows only the step is wrong. However, the hint-generating DeduceIt is able to give her more specific feedback, e.g. ``Your conclusion is incorrect." In this example proof search finds a viable alternative conclusion, $x=3-1$, which matches the rule and assumption the student entered, so DeduceIt knows it is possible to apply the selected rule upon the selected assumptions.
+
+Other hint-generating systems might hold constant different parts of the derivation (e.g. searching for rules and assumptions to match a given conclusion), or leverage the Proof Tree to provide students with hints particular to common derivation paths. It is important to us that the system provide useful hints without giving away too much information: a tricky balance to achieve in an automated system. Hint generation is the subject of ongoing work.
+
+\section{The Internals of DeduceIt}
+
+
+DeduceIt has three components: a frontend interface, a backend theorem prover, and a database. The frontend component manages all user interactions (for both students and instructors) as we describe in the previous section. The theorem prover component is based on a rewrite rule system, and it exposes an on-line API which the frontend calls upon to check student derivations. The database component stores all user and assignment information, including the Proof Cache.
+
+\subsection{The Theorem Prover}
+
+DeduceIt's backend theorem prover uses a term rewriting rule system to check student derivations. The rewriting system is standard except for two modifications: support for equalities, and support for a containment condition on rewrite application. The prover also includes a parser, which parses strings into term expressions. This parser is constructed dynamically so that instructors can define custom syntax.
+
+\subsubsection{The Theorem Prover API}
+
+The prover is wrapped in web server which can be queried via an API which takes the following parameters: \textit{rulesets}, \textit{assumptions}, \textit{syntax}, and \textit{conclusion}. These parameters function much as their names suggest. The \textit{syntax} parameter defines any modifications to the default rewrite language (on every API query, DeduceIt constructs a new parser). Then DeduceIt tries to prove a given \textit{conclusion} using the set of rewrite rules defined in \textit{rulesets} on the starting expressions passed through \textit{assumptions}. 
+
+Although in the previous section we mention a student can specify only one ruleset at each step of a derivation, it is usually necessary to pass the backend more than one: the ruleset named by the student, and any rulesets which are declared ``free." These free rules are allowed in any step of the derivation. In figure 0 we show an API query.
+
+
+
 
 \subsection{Normal or Body Text}
 
