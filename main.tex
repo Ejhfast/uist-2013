@@ -263,8 +263,13 @@ In practice, DeduceIt conducts one round of forward search and one round of back
 
 \subsection{The Proof Cache}
 
-The proof cache!
+The proof cache is a data structure DeduceIt uses to track all responses the frontend application receives from the prover. This cache is composed of many proof trees, one for each assignment, and together these proof trees track the aggregate history of every attempted derivation (as we discussed in the previous section). Proof trees are useful enough for managing assignments---through them an instructor can annotate derivation steps and override the default behavior of the prover---but they can also, by acting as a cache, potentially improve the overall performance of the system. To check a new derivation step using the cache, DeduceIt walks down the appropriate proof tree: if the new step already exists in the tree, then the system doesn't need to query the prover; it simply returns the stored result.
 
+If students tend to follow similar paths through their derivations, then we hypothesize it will be efficient to reuse the intermediate results of one student's derivation to check the validity of another's---particularly if the cost of a checking a step in the derivation is so much higher than the cost of looking up a result in the cache. Intuitively, this would seem to be the case. The cost of the average prover API query is X seconds, whereas a typical cache lookup takes only Y seconds.
+
+We evaluate the performance impact of the proof cache more fully in the next section.
+
+\section{Evalutation}
 
 \subsection{Normal or Body Text}
 
