@@ -235,31 +235,35 @@ Other hint-generating systems might hold constant different parts of the derivat
 \section{The Internals of DeduceIt}
 
 
-DeduceIt has three components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors), the backend theorem prover exposes an on-line API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the Proof Cache.
+DeduceIt is a system formed of three distinct components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors) as described in the previous section, the backend theorem prover exposes an on-line API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the Proof Cache.
 
 We built these components using several technologies and cloud providers. The frontend is a Ruby on Rails web application deployed on Heroku, the backend is a Haskell application also deployed on Heroku, and the database is a MongoDB installation running on MongoHQ. Each of these components can be scaled to serve arbitrary numbers of students.
 
 \subsection{The Theorem Prover}
 
-To verify derivations, DeduceIt applies proof search on a term rewriting system. Our system differs from a standard rewriting system in that it supports rulesets (i.e. named groups of rewrite rules), equalities, dynamic evaluation for some expressions, and containment conditions on the application of certain rewrites. We discuss each of these features in the previous section. 
+To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e. named groups of rewrite rules), equalities, dynamic evaluation for some term expressions, and containment conditions on the application of certain rewrites. We discussed each of these features in the previous section. 
 
-DeduceIt's theorem prover also includes a parser, which the system constructs dynamically---per API call---allowing instructors to define custom assignment syntax. As the backend prover supports the notion of rulesets in addition to simple rewrite rules, naturally the parser is capable of parsing these rulesets, which require a bit of extra notation (generated behind the scenes by the frontend). In general, the parser handles deconstruction of an API call into expression terms of the rewrite language. 
+DeduceIt's theorem prover also includes a parser which the system constructs dynamically, per API call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct an API call into expression terms of the rewrite language. 
 
 \subsubsection{The Theorem Prover API}
 
-DeduceIt's prover is wrapped in web server which can be queried via an API using the following POST parameters: \textit{rulesets}, \textit{assumptions}, \textit{syntax}, and \textit{conclusion}. The prover will respond with ``proven", ``unproven'', or ``syntax error.'' 
+The DeduceIt prover is wrapped in web server which can be queried via API on the following POST parameters: \textit{rulesets}, \textit{assumptions}, \textit{syntax}, and \textit{conclusion}. To every query the prover will respond with either ``proven", ``unproven'', or ``syntax error.'' The frontend uses this API to assess the validity of each step in a derivation.
 
-The API parameters function much as their names suggest. The \textit{syntax} parameter defines any new syntax on the default rewrite language. DeduceIt tries to prove the provided \textit{conclusion} expression using the set of rewrite rules defined in \textit{rulesets} on the starting expressions in \textit{assumptions} (assuming these parameters parse). 
+The API parameters function much as their names suggest. The \textit{syntax} parameter defines any new syntax on the default rewrite language. The rest are used for proof search: DeduceIt tries to prove the provided \textit{conclusion} expression using the set of rewrite rules defined in \textit{rulesets} on the starting expressions in \textit{assumptions} (that is, assuming all these parameters parse). 
 
-Although in the previous section we mentioned a student can select only one ruleset for each step of a derivation, it is usually necessary to pass the backend prover more than one. The prover requires both the ruleset named by the student and any rulesets which are declared ``free," as these free rulesets are always allowed for any step of the derivation. In figure 0 we show an example API query.
+Although in the previous section we mentioned a student can select only one ruleset for each step of a derivation, it is usually necessary to pass the backend prover more than one. This is necessary because the prover requires not only the ruleset selected on the given step, but also any other rulesets which are declared ``free." Free rulesets are always allowed for any step of the derivation; in general they tend to be common or trivial transformations, orthogonal to the didactic goals of an assignment. 
+
+In figure 0 we show an example API query.
 
 \subsubsection{Proof Search}
 
-Proof search works by applying rewrite rules iteratively upon a group of expressions to generate new expressions. In general, search may be considered either \textit{forward}, starting from the known expressions and working toward the desired expressions, or \textit{backward}, starting from the desired expressions and working towards the known expressions. DeduceIt supports both kinds of search. 
+In DeduceIt, proof search works by applying rewrite rules iteratively upon a group of expressions to generate new expressions. In general, a search may be considered either \textit{forward}, starting from the known expressions and working toward the desired expressions, or \textit{backward}, starting from the desired expressions and working toward the known expressions with an inverted set of rules. DeduceIt supports both kinds of search. 
 
-For example, suppose we give DeduceIt the assumption $a$, the rewrite rule $a \rightarrow a.a$, and the conclusion $a.a.a$. The system has several options. It may conduct forward search: start from $a$ and apply the rule twice, first producing $a.a$ and then $a.a.a$. Or it may search backward: construct a new rule $a.a \rightarrow a$ (the inverse of the old rule) and start from $a.a.a$, and then apply this new rule twice to produce $a.a$ and then $a$. Either method leads the system to declare the step valid.
+For example, suppose we give DeduceIt the assumption $a$, the rewrite rule $a \rightarrow a.a$, and the conclusion $a.a.a$. The system may conduct a forward search: start from $a$ and apply the rule twice, first producing $a.a$ and then $a.a.a$. Or it may search backward: construct a new rule $a.a \rightarrow a$ (the inverse of the old rule) and start from $a.a.a$, and then apply this new rule twice to produce $a.a$ and then $a$. Either method leads the system to declare the step valid.
 
-In practice, DeduceIt conducts one round of forward search and one round of backward search; the two rounds of search then meet in the middle. Notably, we introduce backward search to ensure DeduceIt will correctly check rewrite languages which allow the introduction of new variables, e.g. predicate logic and the rule $\$a \rightarrow \$a \vee \$b$. For these languages forward search is not sufficient. We have found the system is limited to a search depth of two under reasonable time constraints. At each step of search DeduceIt applies the set of available rewrite rules---defined in the collection of rulesets---non-deterministically and exhaustively. 
+In practice, DeduceIt conducts one round of forward search and one round of backward search; the two rounds of search then meet in the middle, i.e. they check for terms generated in common. We introduce backward search to ensure DeduceIt will correctly check rewrite languages which allow the introduction of new symbols, e.g. predicate logic and the rule $\$a \rightarrow \$a \vee \$b$ (note here that $\$b$ is a variable in the rewrite rule which binds to \textit{any expression}, so forward search cannot enumerate every possible value of $\$b$). Moreover, the meet in the middle approach tends to be more effective than two rounds of only forward or backward search. 
+
+We find the system is limited to two rounds of search under reasonable time constraints: an upper bound of 4 seconds, for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. 
 
 \subsection{The Proof Cache}
 
