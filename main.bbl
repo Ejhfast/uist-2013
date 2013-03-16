@@ -1,0 +1,107 @@
+\begin{thebibliography}{10}
+
+\bibitem{automated-scoring-design}
+Bennett, R.~E., and Bejar, I.~I.
+\newblock Validity and automated scoring: It's not only the scoring, 1998.
+
+\bibitem{derivation-scoring}
+Bennett, R.~E., Steffen, M., Singley, M.~K., Morley, M., and Jacquemin, D.
+\newblock Evaluating an automatically scorable, open-ended response type for
+  measuring mathematical reasoning in computer-adaptive tests, 1997.
+
+\bibitem{dynamic-rules}
+Bravenboer, M., van Dam, A., Olmos, K., and Visser, E.
+\newblock Program transformation with scoped dynamic rewrite rules, July 2005.
+
+\bibitem{grade-programs}
+Cheang, B., Kurnia, A., Lim, A., and Oon, W.-C.
+\newblock On automated grading of programming assignments in an academic
+  institution.
+\newblock {\em Comput. Educ. 41}, 2 (Sept. 2003), 121--131.
+
+\bibitem{maude}
+Clavel, M., Durán, F., Eker, S., Lincoln, P., Martí-Oliet, N., Meseguer, J.,
+  and Quesada, J.~F.
+\newblock Maude as a metalanguage, 1998.
+
+\bibitem{personalized-feedback}
+Gallien, T., and Oomen-Early, J.
+\newblock Personalized versus collective instructor feedback in the online
+  courseroom: Does type of feedback affect student satisfaction, academic
+  performance and perceived connectedness with the instructor?, July 2008.
+
+\bibitem{automated-grading}
+Hearst, M.
+\newblock The debate on automated essay grading, Sept.-Oct.
+
+\bibitem{peer-consistency}
+Huang, S.-W., and Fu, W.-T.
+\newblock Enhancing reliability using peer consistency evaluation in human
+  computation.
+\newblock In {\em Proceedings of the 2013 conference on Computer supported
+  cooperative work}, CSCW '13, ACM (New York, NY, USA, 2013), 639--648.
+
+\bibitem{lisp-logic}
+Kaufmann, M., and Moore, J.~S.
+\newblock An industrial strength theorem prover for a logic based on common
+  lisp.
+\newblock {\em IEEE Trans. Softw. Eng. 23}, 4 (Apr. 1997), 203--213.
+
+\bibitem{crowd-snippets}
+Lieber, T., and Miller, R.
+\newblock Programming with everybody: tightening the copy-modify-publish
+  feedback loop.
+\newblock In {\em Adjunct proceedings of the 25th annual ACM symposium on User
+  interface software and technology}, UIST Adjunct Proceedings '12, ACM (New
+  York, NY, USA, 2012), 101--102.
+
+\bibitem{rewriting-logic}
+Martí-Oliet, N., and Meseguer, J.
+\newblock Rewriting logic: Roadmap and bibliography, 2001.
+
+\bibitem{isabelle1}
+Nipkow, T., Wenzel, M., and Paulson, L.~C.
+\newblock {\em Isabelle/HOL: a proof assistant for higher-order logic}.
+\newblock Springer-Verlag, Berlin, Heidelberg, 2002.
+
+\bibitem{interface-learning-load}
+Oviatt, S., Arthur, A., and Cohen, J.
+\newblock Quiet interfaces that help students think.
+\newblock In {\em Proceedings of the 19th annual ACM symposium on User
+  interface software and technology}, UIST '06, ACM (New York, NY, USA, 2006),
+  191--200.
+
+\bibitem{enroll}
+Pappano, L.
+\newblock Massive open online courses are multiplying at a rapid pace.
+
+\bibitem{coq}
+Paulin-Mohring, C.
+\newblock Inductive definitions in the system coq rules and properties, 1992.
+
+\bibitem{isabelle}
+Paulson, L.~C.
+\newblock The foundation of a generic theorem prover, 1989.
+
+\bibitem{moss}
+Schleimer, S., Wilkerson, D.~S., and Aiken, A.
+\newblock Winnowing: local algorithms for document fingerprinting.
+\newblock In {\em Proceedings of the 2003 ACM SIGMOD international conference
+  on Management of data}, SIGMOD '03, ACM (New York, NY, USA, 2003), 76--85.
+
+\bibitem{suppes}
+Suppes, P.
+\newblock The next generation of interactive theorem provers, 1984.
+
+\bibitem{suppes-prover}
+Suppes, P.
+\newblock Student use of an interactive theorem prover, 1984.
+
+\bibitem{peer-assessment}
+Tosic, M., and Nejkovic, V.
+\newblock Trust-based peer assessment for virtual learning systems.
+\newblock In {\em Proceedings of the Second international conference on Social
+  informatics}, SocInfo'10, Springer-Verlag (Berlin, Heidelberg, 2010),
+  176--191.
+
+\end{thebibliography}

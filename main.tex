@@ -65,9 +65,9 @@ breaklinks=true,
 
 \numberofauthors{1}
 \author{
-  \alignauthor Ethan Fast, Colleen Lee, Daphne Koller, Michael Bernstein, Alex Aiken\\
+  \alignauthor Ethan Fast, Colleen Lee, Michael Bernstein, Daphne Koller, Alex Aiken\\
     \affaddr{Stanford University}\\
-    \email{\{ethan.fast, clee0, koller, aiken, msb\}@cs.stanford.edu}\\
+    \email{\{ethan.fast, clee0, msb, koller, aiken\}@cs.stanford.edu}\\
 }
 
 \maketitle
@@ -99,11 +99,11 @@ As instructors begin to teach hundreds of thousands of students in on-line class
 
 % However, student communities cannot entirely replace the roles Professors and TAs. Even the most capable of students will tend to lack the domain knowledge of the instructor, and when feedback occurs---usually on some kind of forum--
 
-When the size of an on-line course increases, the attention of its instructors and TAs necessarily becomes more scarce. They are unable to provide large numbers of students---to date the largest MOOC has enrolled more than 180,000---with feedback on their assignments; much less to present it in real-time. In particular, grading becomes intractable unless it is automated, which it often cannot be, particularly in complex domains where students may construct correct solutions in many different ways. 
+When the size of an on-line course increases, the attention of its instructors and TAs necessarily becomes more scarce. They are unable to provide large numbers of students---to date the largest MOOC has enrolled more than 180,000 \cite{enroll}---with feedback on their assignments; much less to present it in real-time. In particular, grading becomes intractable unless it is automated. But automation is often hard to achieve, particularly in complex domains where students may construct correct solutions in many different ways. \cite{automated-scoring-design, automated-grading}
 
-These constraints are important limitations to the MOOC model. Students tend to learn better when subject to tight feedback loops [?], and many subjects, if taken in a traditional course, grade students on proofs or derivations, where there are many ways to describe a correct answer.
+These constraints are important limitations to the MOOC model. Students tend to learn better when subject to tight and personal feedback loops \cite{personalized-feedback} and many subjects, when taken in a traditional class setting, grade students on proofs or derivations where there are many ways to describe a correct answer.
 
-MOOC platforms have attempted to automate away some of these issues, but providing thousands of students with \textit{constructive} and \textit{real-time} feedback has remained an unsolved problem. Coursera and Udacity give instructors out-of-the-box tools to build assignments and quizzes with automated grading features, but these tools lack flexibility: evaluation is constrained to discrete, instructor-specified solutions and offers students a limited feedback loop (e.g. ``correct," or ``incorrect"). For technical, mathematical, or scientific domains where assignment solutions are often \textit{derivations}---many-staged and prone to individual variation---this limitation is particularly problematic.
+MOOC platforms have attempted to automate away some of these issues, but providing thousands of students with \textit{constructive} and \textit{real-time} feedback has remained an unsolved problem. \cite{derivation-scoring} Coursera and Udacity give instructors out-of-the-box tools to build assignments and quizzes with automated grading features, but these tools lack flexibility: evaluation is constrained to discrete, instructor-specified solutions and offers students a limited feedback loop (e.g. ``correct," or ``incorrect"). \cite{fixme} For technical, mathematical, or scientific domains where assignment solutions are often \textit{derivations}---many-staged and prone to individual variation---this limitation is particularly problematic. \cite{derivation-scoring} And other related research suggests that as a system departs further from a traditional ``pen and paper" interface, a greater cognitive load is placed upon the student. \cite{interface-learning-load}
 
 To address these limitations we present:
 %(e.g. in our Compilers course we use it to assign problems in type checking, regular expressions, finite automata, and many other topics; its generality allows its use in most formal systems).
@@ -113,12 +113,45 @@ To address these limitations we present:
 \item An \textit{empirical evaluation} of DeduceIt: A report on the data we have collected from a massive on-line class with thousands of students doing dozens of exercises.
 \end{itemize}
 
-The rest of this paper is organized as follows: We begin with related work and a motivating example, then present DeduceIt's interface and capabilities. Next, we describe the underlying architecture of the system and provide an empirical evaluation, using data collected from thousands of students in an on-line class. We close with reflections, conclusions, and future work.
+The rest of this paper is organized as follows: We begin with related work and a motivating example, then present DeduceIt's interface and capabilities. Next, we describe the underlying architecture of the system and provide an empirical evaluation, using data collected from students in an on-line class. We close with reflections, conclusions, and future work.
 
 \section{Related Work}
-There is quite a bit of related work on proof solving systems and derivation helpers. Several existing tools already provide users with rich and automated feedback as they work through a derivation, but these tools are principally designed for expert users and unsuited to the MOOC audience. For instance, the X tool and the Y tool might allow experts to explore problem domains in predicate logic or mathematics, but their interfaces are not designed to be accessible to lay students, or even to a typical course instructor. 
+At its core, DeduceIt is an interactive proof solving system, and there exists quite a bit of related work on this subject. Many existing tools already provide users with rich and automated feedback as a form of proof assistance \cite{coq,maude,isabelle, isabelle1,lisp-logic}, but these tools are designed for experts and are generally unsuited to the MOOC audience. For instance, tools like \textit{coq} and \textit{isabelle} allow users to explore complex problem domains (e.g. isabelle has been used to encode ideas as nuanced as Godel's Incompleteness Theorem), but their interfaces are not designed to be accessible to lay students or---depending on the course in question---even to a typical instructor. 
 
-Moreover, automatic feedback and grading systems are often domain-specific and do not grant an instructor sufficient flexibility in defining a set of disparate problems. Sometimes this approach works well: automated grading systems have long evaluated student program code in computer science departments (and now also commercially). But we are concerned here with more general systems.
+Some prior work has looked specifically at applying automated theorem provers in an educational context. \cite{suppes, suppes-prover} In fact, DeduceIt draws a great deal on the insights of researches like \textit{Suppes}, and the idea of using theorem provers to enable education has engendered much discussion among researchers. \cite{automated-grading, automated-scoring-design} However, even systems designed to address educational use have tended toward complicated interfaces, typically involving unstructured interactions with a terminal-like environment. Moreover, no such system has been deployed at web scale to serve thousands of students. [Fixme: more examples of these systems, if any?]
+
+There exists other more domain specific work in automatic feedback and grading systems. Simple forms of automatic grading have been studied in both physical and on-line classrooms [fixme: citation]. These systems tend to restrict an assignment's answer domain with assumptions like multiple choice answers, concrete-valued answers (e.g. answers that match against a string or numerical value), or a set of test cases to evaluate a programming assignment. While restricting the answer domain can work well for certain subjects or applications, in general it does not grant an instructor sufficient means to evaluate more creative or complex assignments. There exist various exceptions here as well: for instance, automated grading and plagiarism detection systems have long evaluated student program code---where solutions may be unstructured and creative---in computer science departments \cite{grade-programs, moss}, and also commercially. We are concerned here with a different kind of system.
+
+Finally, crowdsourcing research has enabled new forms of problem-solving and evaluation. For instance, peer consistency evaluation can be used to effectively judge the accuracy---and grade---of a student's answer, even in the absence of a ground truth \cite{peer-consistency}; crowd-based peer assessment has been successfully applied to grade student assignments \cite{peer-assessment}; and crowds have been used to detect and generate various canonical features of a language, like code snippets for use in an IDE. \cite{crowd-snippets}. While DeduceIt's proof cache draws inspiration from crowd research---the system leverages the results of one student to help another---humans are never directly involved in assignment evaluation. We hope to further involve the crowd in DeduceIt's computations as a subject of future work.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{emptyline}
+\caption{A derivation prompts the user to enter another step.}
+\label{fig:emptyline}
+\end{figure}
+
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{regexproof}
+\caption{A derivation with correct and incorrect steps.}
+\label{fig:regexproof}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.7\columnwidth]{selectassumptions}
+\caption{Selecting assumptions in a derivation. These include the givens and any expressions proven earlier in the derivation.}
+\label{fig:selectassumptions}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{rules}
+\caption{The set of rules available to a user.}
+\label{fig:rules}
+\end{figure}
 
 \section{Motivating Example}
 
@@ -152,11 +185,41 @@ We begin this section with background information about term rewriting systems, 
 
 \subsection{Term Rewriting Systems}
 
-DeduceIt uses a term rewriting system to verify student derivations. In general, a rewriting system consists of a set of objects and relations which define transformations on those objects; each transformation is called a rewrite rule. A \textit{term} rewriting system is a rewriting system which operates on expressions with nested sub-expressions.
+DeduceIt uses a term rewriting system to verify student derivations. In general, a rewriting system consists of a set of objects and relations which define transformations on those objects; each transformation is called a rewrite rule. A \textit{term} rewriting system is a rewriting system which operates on expressions with nested sub-expressions. \cite{rewriting-logic, isabelle}
 
 Term rewrite rules define transformations which occur between terms. These rules have a left side, which must match a term for the rule to be applied, and a right side, which defines the new expression produced by the rule. Variables may appear in the rule (declared in the system with $\$$ notation) which bind to the term or its subexpressions. For example, in a language which supports integers, symbols, and the binary operators $+$, $-$, and $=$ (this happens to be a subset of the default DeduceIt language), one such rule might be: $(\$x+\$y=\$z) \rightarrow (\$x=\$z-\$y)$. The system can apply this rule to the expression $2+1=3$ to produce $2=3-1$.
 
-While DeduceIt's derivation checker operates primarily as a term rewriting system, it differs from a standard system in several respects. First, DeduceIt supports an assumption of equality in certain rewrites, where specified by an instructor. Rewrite rules which assume equality (declared with $:=$ instead of $\rightarrow$) can be applied recursively upon term subexpressions; the entire term need not match the rule, but only a subexpression of that term. This makes DeduceIt more efficient at verifying certain common derivations. Second, DeduceIt supports the dynamic evaluation of basic mathematical expressions. For instance, if DeduceIt is provided with a set of rules which govern basic algebra and the expression $x=3-1$, it can derive $x=2$ by using the dynamic rule $\$x-\$y := eval(\$x-\$y)$. This rewrite is also an example of a rule which assumes equality.
+While DeduceIt's derivation checker operates primarily as a term rewriting system, it differs from a standard system in several respects. First, DeduceIt supports an assumption of equality in certain rewrites, where specified by an instructor. Rewrite rules which assume equality (declared with $:=$ instead of $\rightarrow$) can be applied recursively upon term subexpressions; the entire term need not match the rule, but only a subexpression of that term. This makes DeduceIt more efficient at verifying certain common derivations. Second, DeduceIt supports the dynamic evaluation of basic mathematical expressions. \cite{dynamic-rules} For instance, if DeduceIt is provided with a set of rules which govern basic algebra and the expression $x=3-1$, it can derive $x=2$ by using the dynamic rule $\$x-\$y := eval(\$x-\$y)$. This rewrite is also an example of a rule which assumes equality.
+
+%Fixme: talkabout conditional rules
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{assign_meta}
+\caption{Basic data associated with an assignment.}
+\label{fig:assign_meta}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{rewrite_language}
+\caption{Instructors must specify a rewrite language for each assignment.}
+\label{fig:rewrite_language}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{editruleset}
+\caption{Editing a ruleset on the instructor interface.}
+\label{fig:editruleset}
+\end{figure}
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{syntax}
+\caption{Adding new syntax on the instructor interface.}
+\label{fig:syntax}
+\end{figure}
 
 \subsection{The instructor view}
 
@@ -178,8 +241,7 @@ $$a.b.b.a$$
 $$x+2=y$$ 
 Note that with three exceptions (the notation specific to rewrites: $:=$, $\rightarrow$, and $\$$) the operators used in these expressions have no meaning without an accompanying set of rules; they simply determine the parsing of an expression.
 
-Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and variable argument functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by latex. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g. $\backslash{}sin\{x\}$. Figure 0 shows DeduceIt's custom syntax creation view.
-
+Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and variable argument functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by latex. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g. $\backslash{}sin\{x\}$. Figure \ref{fig:syntax} shows DeduceIt's custom syntax creation view.
 
 \subsubsection{Rulesets}
 
@@ -191,11 +253,18 @@ Various constraints may be defined on the variable terms used in the ruleset. Th
 
 A ruleset may also be either ``required" or ``free." While a required ruleset must be named explicitly when a student uses it in a derivation, a ``free" ruleset may be elided. Behind the scenes, DeduceIt will attempt to fill in such ``free" steps automatically through proof search. This is useful when a student must use trivial transformations which are necessary to the derivation but unimportant to the assignment. For example, a student may want to rearrange terms in a mathematical expression as part of some broader rule application. DeduceIt's ``free" rules allow the student to skip over these steps.  
 
-In figure 0 we show DeduceIt's Ruleset creation view.
+In figure \ref{fig:editruleset} we show DeduceIt's Ruleset creation view.
 
 \subsubsection{Sharing Rewrite Languages}
 
 Some rewrite languages are common enough that it makes sense to share them among different assignments: for instance, many assignments might use the languages defined for basic algebraic manipulation, predicate logic, or the expansion of regular expressions. DeduceIt allows instructors to reuse a rewrite language across assignments.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{nodeannote}
+\caption{Annotating a node on the proof tree.}
+\label{fig:nodeannote}
+\end{figure}
 
 \subsubsection{The Assignment Proof Tree}
 
@@ -243,7 +312,7 @@ We built these components using several technologies and cloud providers. The fr
 
 To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e. named groups of rewrite rules), equalities, dynamic evaluation for some term expressions, and containment conditions on the application of certain rewrites. We discussed each of these features in the previous section. 
 
-DeduceIt's theorem prover also includes a parser which the system constructs dynamically, per API call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct an API call into expression terms of the rewrite language. 
+DeduceIt's theorem prover also includes a parser which the system constructs dynamically, per API call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct an API call into expression terms of the rewrite language, before it passes these terms to the prover.
 
 \subsubsection{The Theorem Prover API}
 
@@ -253,7 +322,7 @@ The API parameters function much as their names suggest. The \textit{syntax} par
 
 Although in the previous section we mentioned a student can select only one ruleset for each step of a derivation, it is usually necessary to pass the backend prover more than one. This is necessary because the prover requires not only the ruleset selected on the given step, but also any other rulesets which are declared ``free." Free rulesets are always allowed for any step of the derivation; in general they tend to be common or trivial transformations, orthogonal to the didactic goals of an assignment. 
 
-In figure 0 we show an example API query.
+In [fixme] we show an example API query.
 
 \subsubsection{Proof Search}
 
@@ -274,269 +343,113 @@ We formed two hypotheses about the proof cache:
   \item Students tend to complete their derivations in similar ways; that is, they follow similar paths through an assignment's proof tree.
   \item It is more efficient to reuse the intermediate results of one student's derivation to check the validity of another student's derivation, when compared to checking every derivation step with the prover. 
 \end{enumerate}  
-  The second hypothesis seemed particularly likely to us since the cost of a checking a step with the prover is much higher than the cost of looking up a result in the cache. An average prover API query takes X seconds, whereas a typical cache lookup takes only Y seconds. We evaluate the performance impact of the proof cache more fully in the next section.
+  The second hypothesis seemed particularly likely to us since the cost of a checking a step with the prover is much higher than the cost of looking up a result in the cache. An average prover API query takes $4000ms$, whereas a typical cache lookup takes only $900ms$ seconds. We evaluate the performance impact of the proof cache more fully in the next section.
 
 \section{Evaluation}
 
-To better evaluate DeduceIt's usefulness, we deployed it in the winter offering of Coursera's \textit{Compilers} class, where we assigned each student two DeduceIt problems for every week of the course. Out of the 7625 students who enrolled in the course, 1788 of them participated actively, and 1000 of these students completed at least one DeduceIt assignment.
+To better evaluate DeduceIt's usefulness, we deployed it in the winter offering of Coursera's \textit{Compilers} class, where we assigned each student several DeduceIt problems for every week of the course. Out of the 7625 students who enrolled, 1788 of them participated actively, and 1000 (fixme) of these students completed at least one DeduceIt assignment.
 
-In this section we analyze several aspects of the system. We begin with a broad measure of system performance, then for a few representative assignments we look at: the distribution of students' time spent on derivations, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache.
-
-Out of the 11 DeduceIt assignments, we chose Assignment1, Assignment2, and Assignment3. Assignment1 is something. Assignment2 is something. Assignment3 is something. These assignments were also chosen as examples which become progressively more difficult.
+In this section we analyze several aspects of the DeduceIt system. We begin with a broad measure of system performance, and then for ten DeduceIt assignments we analyze the distribution of students' time spent on derivations, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache. Finally, we take a closer look at three assignments, to provide an example of the new kinds of analyses that DeduceIt enables.
 
 \subsection{System Performance}
+
+In the first experiment, we measure the relation between system latency and load. Since a MOOC will typically enroll thousands of students, it is important that DeduceIt maintain responsiveness when visited concurrently by many users. 
+
+Our analytics show DeduceIt receives one incoming request per minute on average. However, at peak load---usually associated with an assignment deadline---the application may receive up to $X$ incoming requests per minute. Since DeduceIt runs on a cloud provider, we can add necessary resources on demand to handle this additional traffic. 
+
+Over the length of the course, DeduceIt's average latency was $900ms$. At times of peak load, this latency was $1100ms$. 
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{distributions}
+\caption{We construct normalized histograms to show the student time distributions for each assignment. The x-axis measures time in minutes.}
+\label{fig:distributions}
+\end{figure}
+
+\begin{table}[!h]
+  \begin{tabular}{|c|c||c|c|c|}
+    \hline
+    \tabhead{Assignment Name} & \tabhead{Success} & \tabhead{Valid} & \tabhead{Syntax} & \tabhead{Semantic} \\
+    \hline
+    Regular Expressions I & 96 & 55 & 11 & 34 \\
+    \hline
+    Lexical Analysis II & 97 & 63 & 6 & 30 \\
+    \hline
+    Finite Automata I & 98 & 73 & 3 & 23 \\
+    \hline
+    Leftmost Derivation & 95 & 56 & 6 & 38 \\
+    \hline
+    Rightmost Derivation & 98 & 81  & 1 & 17 \\
+    \hline
+    More Derivations & 99 & 81 & 1 & 18 \\
+    \hline
+    Recursive Descent Parsing & 96 & 69 & 1 & 29 \\
+    \hline
+    LL(1) Parsing & 99 & 83 & 1 & 15 \\
+    \hline
+    Shift-Reduce Parsing & 94 & 85 & 2 & 12 \\
+    \hline
+    SLR(1) Parsing & 93 & 60 & 2 & 36 \\
+    \hline
+  \end{tabular}
+  \caption{We measure student success rates for each assignment and the corresponding student error rates, broken down into syntax errors and semantic errors.}
+  \label{tab:table1}
+\end{table}
+
 \subsection{Student Time Distributions}
+
+In the second experiment, we analyzed the amount of time students spent on each derivation. Our results are displayed in figure \ref{fig:distributions}. These time distributions are approximately normal and centered upon a fixed time value which tracks loosely with an assignment's difficulty. For example, in the Rightmost Derivation assignment students are clustered around $4$ minutes, and in the Shift-Reduce Parsing assignment they are clustered around $10$ minutes; the Rightmost Derivation assignment was generally considered easier by students than the Shift-Reduce Parsing assignment. This relation also holds true among the remainder of the assignments.
+
+As instructors, we were heartened by the speed at which most students completed even the harder assignments like Shift-Reduce parsing. We were also pleasantly surprised by student success rates, as we will see in the next section.
+
 \subsection{Student Success Rates}
+
+In the third experiment, we examined how the success rates of students vary across assignments. Our results are displayed in table \ref{tab:table1}. Success rates are uniformly high across assignments, ranging from $94\%$ to $98\%$, and these rates also track reported assignment difficulty in a manner consistent with time distributions.
+
+We were also curious whether student success rates are correlated with other assignment features. To this end, we formed several hypotheses. First, we predict that student success is more likely when the length of the shortest viable derivation is smaller. Second, we predict the same when an assignment is less complex (e.g. there are fewer rules or assumptions provided in an assignment). We tested several of these hypotheses, as we show in figure \ref{fixme}.
+
+[Fixme: actually test these? What hypotheses do we want to test, if any?]
+
 \subsection{Student Error Rates}
+
+In the fourth experiment, we look at student error rates. Error rates among derivation steps for all the DeduceIt assignments are substantial, despite the high overall assignment success rates reported in table \ref{tab:table1}. We expected this result; students will always get some things wrong, and learning rarely takes place without error \cite{fixme}. However, ideally we would like to distinguish between two classes of error: errors which stem from a misunderstanding of course material, and errors which stem from misunderstandings associated with the DeduceIt interface.
+
+To approximate the impact of these two classes of error, we divide student mistakes into two categories: syntax errors, and semantic errors. Syntax errors arise from entering an expression which DeduceIt cannot parse, whereas semantic errors arise from parseable derivation steps which cannot be proven. While semantic errors are certain to contain faulty logic, this is not obviously true for syntax errors: a student might have intended to write a correct step and simply failed to use the system properly. We use the rates of student syntax errors as a proxy for measuring rates of student confusion with the DeduceIt system.
+
+Across all assignments syntax errors are low, never exceeding $11\%$. Notably, the highest rate of syntax errors occurred in the first class assignment, Regular Expression I, despite the fact that students generally considered this assignment the easiest. The syntax error rates of subsequent assignments never exceeded $6\%$, although these later assignments were much more difficult. This suggests that while DeduceIt may have a learning curve, it is probably not a significant barrier to using the system. In general, low overall rates among syntax errors suggest that DeduceIt is not confusing students to the detriment of assignment completion and correctness.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1\columnwidth]{proofcache}
+\caption{We graph cache hit rates against time for all assignments. The x-axis measures the total number of interactions with DeduceIt. The y-axis measures cache hit rates as a percentage.}
+\label{fig:proofcache}
+\end{figure}
+
 \subsection{Performance Impact of the Cache}
+
+In the final experiment, we measure the impact of DeduceIt's proof cache on overall system efficiency. As we have discussed, the time cost differential between a call to the Prover API and a proof cache lookup is high --- $900ms$ vs $4300ms$. This suggests that as long as the hit rate of the proof cache is also relatively high, the cache will provide the system with enormous time savings. 
+
+In figure \ref{fig:proofcache}, we show the cache hit rate plotted against time. Although there are some differences in these plots, in each case the proof cache rises to a high hit rate very quickly. In every case, by the $Xth$ student interaction, the cache has reached a hit rate of $85\%$. From this, we can safely accept a $15\%$ hit rate as a lower bound. To measure the overall gain in efficiency from the cache we can compute:
+$$Cache: 4000*0.15 + 1000 = 1600ms$$
+This is meant to be a conservative estimate; the system latency we measure empirically is $900ms$. And when evaluated against a system without the cache---at $4000ms$ per interaction---this represents a cost savings of $60\%$.
+
+High cache hit rates suggest that students tend to follow similar paths through their derivations. In table \ref{tab:table2} we show the number of unique assignment derivations compared against the overall cache hit rate for each assignment. [Fixme: acutally do this.]
+
+\subsection{New Possibilities for Analysis}
+
+Out of the 11 DeduceIt assignments, we look more closely at \textit{Regular Expressions I}, \textit{Leftmost Derivation}, and \textit{LL(1) Parsing} to show the new kinds of analyses which DeduceIt enables: \textit{Regular Expressions I} asks students to prove equivalence between two regular expression, \textit{Leftmost Derivation} asks students to perform a leftmost derivation using a provided grammar, and \textit{LL(1) Parsing} asks students to derive a string using a the provided LL(1) parsing table. We chose these assignments as representative examples which become progressively more difficult.
+
+[Fixme: We never discussed this, but it seems like a good idea. What are some cool ideas/applications for assignment data?]
 
 \section{Conclusions}
 
-Anecdotal feedback and conclusions.
+Fixme: real conclusion
 
-% \subsection{Normal or Body Text}
-% 
-% Please use a 10-point Times Roman font or, if this is unavailable,
-% another proportional font with serifs, as close as possible in
-% appearance to Times Roman 10-point. The Press 10-point font available
-% to users of Script is a good substitute for Times Roman. If Times
-% Roman is not available, try the font named Computer Modern Roman. On a
-% Macintosh, use the font named Times and not Times New Roman. Please
-% use sans-serif or non-proportional fonts only for special purposes,
-% such as headings or source code text.
-% 
-% \subsection{First Page Copyright Notice}
-% 
-% Leave 3 cm (1.25 in.) of blank space for the copyright notice at the
-% bottom of the left column of the first page. In this template a
-% floating text box will automatically generate the required space. Note
-% however that the text box is anchored to the \textbf{ABSTRACT}
-% heading, so if that heading is deleted the text box will disappear as
-% well.  You can replace the default copyright notice by uncommenting
-% the {\textbackslash}toappear block at the beginning of the document
-% and inserting your own text, for example, for versions under review.
-% 
-% \subsection{Subsequent Pages}
-% 
-% On pages beyond the first, start at the top of the page and continue
-% in double-column format.  The two columns on the last page should be
-% of equal length.
-% 
-% \begin{figure}[!h]
-% \centering
-% \includegraphics[width=0.9\columnwidth]{Figure1}
-% \caption{With Caption Below, be sure to have a good resolution image
-%   (see item D within the preparation instructions).}
-% \label{fig:figure1}
-% \end{figure}
-% 
-% \subsection{References and Citations}
-% 
-% Use a numbered list of references at the end of the article, ordered
-% alphabetically by first author, and referenced by numbers in brackets
-% \cite{ethics,
-%   Klemmer:2002:WSC:503376.503378,
-%   Mather:2000:MUT,
-%   Zellweger:2001:FAO:504216.504224}. For
-% papers from conference proceedings, include the title of the paper and
-% an abbreviated name of the conference (e.g., for Interact 2003
-% proceedings, use \textit{Proc. Interact 2003}). Do not include the
-% location of the conference or the exact date; do include the page
-% numbers if available. See the examples of citations at the end of this
-% document. Within this template file, use the \texttt{References} style
-% for the text of your citation.
-% 
-% Your references should be published materials accessible to the
-% public.  Internal technical reports may be cited only if they are
-% easily accessible (i.e., you provide the address for obtaining the
-% report within your citation) and may be obtained by any reader for a
-% nominal fee.  Proprietary information may not be cited. Private
-% communications should be acknowledged in the main text, not referenced
-% (e.g., ``[Robertson, personal communication]'').
-% 
-% \begin{table}
-%   \centering
-%   \begin{tabular}{|c|c|c|}
-%     \hline
-%     \tabhead{Objects} &
-%     \multicolumn{1}{|p{0.3\columnwidth}|}{\centering\tabhead{Caption --- pre-2002}} &
-%     \multicolumn{1}{|p{0.4\columnwidth}|}{\centering\tabhead{Caption --- 2003 and afterwards}} \\
-%     \hline
-%     Tables & Above & Below \\
-%     \hline
-%     Figures & Below & Below \\
-%     \hline
-%   \end{tabular}
-%   \caption{Table captions should be placed below the table.}
-%   \label{tab:table1}
-% \end{table}
-% 
-% \section{Sections}
-% 
-% The heading of a section should be in Helvetica 9-point bold, all in
-% capitals. Use Arial if Helvetica is not available. Sections should
-% not be numbered.
-% 
-% \subsection{Subsections}
-% 
-% Headings of subsections should be in Helvetica 9-point bold with
-% initial letters capitalized.  For
-% sub-sections and sub-subsections, a word like \emph{the} or \emph{of}
-% is not capitalized unless it is the first word of the heading.)
-% 
-% \subsubsection{Sub-subsections}
-% 
-% Headings for sub-subsections should be in Helvetica 9-point italic
-% with initial letters capitalized.  Standard {\textbackslash}section,
-% {\textbackslash}subsection, and {\textbackslash}subsubsection commands
-% will work fine.
-% 
-% \section{Figures/Captions}
-% 
-% Place figures and tables at the top or bottom of the appropriate
-% column or columns, on the same page as the relevant text
-% (see Figure~\ref{fig:figure1}). A figure or table may extend across both
-% columns to a maximum width of 17.78 cm (7 in.).
-% 
-% Captions should be Times New Roman 9-point bold.  They should be numbered (e.g.,
-% ``Table~\ref{tab:table1}'' or ``Figure~\ref{fig:figure2}''), centered
-% and placed beneath the figure or table.  Please note that the words
-% ``Figure'' and ``Table'' should be spelled out (e.g., ``Figure''
-% rather than ``Fig.'') wherever they occur.
-% 
-% Papers and notes may use color figures, which are included in the page
-% limit; the figures must be usable when printed in black and white in
-% the proceedings.  The paper may be accompanied by a short video figure
-% up to five minutes in length.  However, the paper should stand on its
-% own without the video figure, as the video may not be available to
-% everyone who reads the paper.
-% 
-% \section{Language, Style and Content}
-% 
-% The written and spoken language of SIGCHI is English. Spelling and
-% punctuation may use any dialect of English (e.g., British, Canadian,
-% US, etc.) provided this is done consistently. Hyphenation is
-% optional. To ensure suitability for an international audience, please
-% pay attention to the following:
-% 
-% \begin{itemize}
-% \item Write in a straightforward style.
-% \item Try to avoid long or complex sentence structures.
-% \item Briefly define or explain all technical terms that may be
-%   unfamiliar to readers.
-% \item Explain all acronyms the first time they are used in your text---e.g.,
-% ``Digital Signal Processing (DSP)''.
-% \item Explain local references (e.g., not everyone knows all city
-%   names in a particular country).
-% \item Explain ``insider'' comments. Ensure that your whole audience
-%   understands any reference whose meaning you do not describe (e.g.,
-%   do not assume that everyone has used a Macintosh or a particular
-%   application).
-% \item Explain colloquial language and puns. Understanding phrases like
-%   ``red herring'' may require a local knowledge of English.  Humor and
-%   irony are difficult to translate.
-% \item Use unambiguous forms for culturally localized concepts, such as
-%   times, dates, currencies and numbers (e.g., ``1-5-97'' or ``5/1/97''
-%   may mean 5 January or 1 May, and ``seven o'clock'' may mean 7:00 am or
-%   19:00).  For currencies, indicate equivalences---e.g., ``Participants
-%   were paid 10,000 lire, or roughly \$5.''
-% \item Be careful with the use of gender-specific pronouns (he, she)
-%   and other gendered words (chairman, manpower, man-months). Use
-%   inclusive language that is gender-neutral (e.g., she or he, they,
-%   s/he, chair, staff, staff-hours,
-%   person-years). See~\cite{Schwartz:1995:GBF} for further advice and
-%   examples regarding gender and other personal attributes.
-% \item If possible, use the full (extended) alphabetic character set
-%   for names of persons, institutions, and places (e.g.,
-%   Gr{\o}nb{\ae}k, Lafreni\'ere, S\'anchez, Universit{\"a}t,
-%   Wei{\ss}enbach, Z{\"u}llighoven, \r{A}rhus, etc.).  These characters
-%   are already included in most versions of Times, Helvetica, and Arial
-%   fonts.
-% \end{itemize}
-% 
-% \section{Page Numbering, Headers and Footers}
-% 
-% Please submit your anonymous version for reviewing with page numbers
-% centered in the footer.  These must be removed in the final version of
-% accepted papers, as page numbers, headers, and footers will be added
-% by the conference printers.  Comment out the {\textbackslash}pagenumbering
-% command at the top of the document to remove page numbers.
-% 
-% \section{Producing and Testing PDF Files}
-% 
-% We recommend that you produce a PDF version of your submission well
-% before the final deadline.  Your PDF file must be ACM DL
-% Compliant. The requirements for an ACM Compliant PDF are available at:
-% {\url{http://www.sheridanprinting.com/typedept/ACM-distilling-settings.htm}}.
-% 
-% Test your PDF file by viewing or printing it with the same software we
-% will use when we receive it, Adobe Acrobat Reader Version 7. This is
-% widely available at no cost from~\cite{acrobat}.  Note that most
-% reviewers will use a North American/European version of Acrobat
-% reader, which cannot handle documents containing non-North American or
-% non-European fonts (e.g. Asian fonts).  Please therefore do not use
-% Asian fonts, and verify this by testing with a North American/European
-% Acrobat reader (obtainable as above). Something as minor as including
-% a space or punctuation character in a two-byte font can render a file
-% unreadable.
-% 
-% \section{Blind Review}
-% 
-% For archival submissions, CHI requires a ``blind review.'' To prepare
-% your submission for blind review, remove author and institutional
-% identities in the title and header areas of the paper. You may also
-% need to remove part or all of the Acknowledgments text.  Further
-% suppression of identity in the body of the paper and references is
-% left to the authors' discretion. For more details, see the submission
-% guidelines and checklist for your submission category.
-% 
-% \section{Conclusion}
-% 
-% It is important that you write for the SIGCHI audience.  Please read
-% previous years' Proceedings to understand the writing style and
-% conventions that successful authors have used.  It is particularly
-% important that you state clearly what you have done, not merely what
-% you plan to do, and explain how your work is different from previously
-% published work, i.e., what is the unique contribution that your work
-% makes to the field?  Please consider what the reader will learn from
-% your submission, and how they will find your work useful.  If you
-% write with these questions in mind, your work is more likely to be
-% successful, both in being accepted into the Conference, and in
-% influencing the work of our field.
-% 
-% \section{Acknowledgments}
-% 
-% We thank CHI, PDC and CSCW volunteers, and all publications support
-% and staff, who wrote and provided helpful comments on previous
-% versions of this document.  Some of the references cited in this paper
-% are included for illustrative purposes only.  \textbf{Don't forget
-% to acknowledge funding sources as well}, so you don't wind up
-% having to correct it later.
-
-% Balancing columns in a ref list is a bit of a pain because you
-% either use a hack like flushend or balance, or manually insert
-% a column break.  http://www.tex.ac.uk/cgi-bin/texfaq2html?label=balance
-% multicols doesn't work because we're already in two-column mode,
-% and flushend isn't awesome, so I choose balance.  See this
-% for more info: http://cs.brown.edu/system/software/latex/doc/balance.pdf
-%
-% Note that in a perfect world balance wants to be in the first
-% column of the last page.
-%
-% If balance doesn't work for you, you can remove that and
-% hard-code a column break into the bbl file right before you
-% submit:
-%
-% http://stackoverflow.com/questions/2149854/how-to-manually-equalize-columns-
-% in-an-ieee-paper-if-using-bibtex
-%
-% Or, just remove \balance and give up on balancing the last page.
-%
 \balance
 
 % If you want to use smaller typesetting for the reference list,
 % uncomment the following line:
 % \small
 \bibliographystyle{acm-sigchi}
-\bibliography{sample}
+\bibliography{actual}
 \end{document}

@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2012)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: acm-sigchi.bst
+Database file #1: actual.bib
+Warning--entry type for "suppes-prover" isn't style-file defined
+--line 54 of file actual.bib
+Warning--I didn't find a database entry for "fixme"
+You've used 20 entries,
+            2243 wiz_defined-function locations,
+            660 strings with 7539 characters,
+and the built_in function-call counts, 6166 in all, are:
+= -- 577
+> -- 285
+< -- 0
++ -- 122
+- -- 98
+* -- 375
+:= -- 971
+add.period$ -- 48
+call.type$ -- 20
+change.case$ -- 108
+chr.to.int$ -- 0
+cite$ -- 20
+duplicate$ -- 230
+empty$ -- 546
+format.name$ -- 98
+if$ -- 1330
+int.to.chr$ -- 0
+int.to.str$ -- 20
+missing$ -- 9
+newline$ -- 91
+num.names$ -- 40
+pop$ -- 172
+preamble$ -- 1
+purify$ -- 89
+quote$ -- 0
+skip$ -- 205
+stack$ -- 0
+substring$ -- 306
+swap$ -- 58
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 78
+warning$ -- 0
+while$ -- 59
+width$ -- 22
+write$ -- 188
+(There were 2 warnings)
