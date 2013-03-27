@@ -41,11 +41,29 @@ Huang, S.-W., and Fu, W.-T.
 \newblock In {\em Proceedings of the 2013 conference on Computer supported
   cooperative work}, CSCW '13, ACM (New York, NY, USA, 2013), 639--648.
 
+\bibitem{bisearch}
+Kaindl, H., and Kainz, G.
+\newblock Bidirectional heuristic search reconsidered.
+\newblock {\em Journal of Artificial Intelligence Research 7\/} (1997),
+  283--317.
+
 \bibitem{lisp-logic}
 Kaufmann, M., and Moore, J.~S.
 \newblock An industrial strength theorem prover for a logic based on common
   lisp.
 \newblock {\em IEEE Trans. Softw. Eng. 23}, 4 (Apr. 1997), 203--213.
+
+\bibitem{citeulike}
+Kirsh, D., and Maglio, P.~P.
+\newblock {On Distinguishing Epistemic from Pragmatic Action}.
+\newblock {\em Cognitive Science 18}, 4 (1994), 513--549.
+
+\bibitem{chinmay-srk}
+Kulkarni, C., Pang, K., Le, H., Chia, D., Papadopoulos, K., Cheng, J., Koller,
+  D., and Klemmer, S.
+\newblock Peer and self assessment in massive online design classes.
+\newblock {\em ACM Transactions on Computer-Human Interaction (in
+  submission)\/} (2013).
 
 \bibitem{crowd-snippets}
 Lieber, T., and Miller, R.
@@ -58,6 +76,11 @@ Lieber, T., and Miller, R.
 \bibitem{rewriting-logic}
 Martí-Oliet, N., and Meseguer, J.
 \newblock Rewriting logic: Roadmap and bibliography, 2001.
+
+\bibitem{neilsen}
+Nielsen, J.
+\newblock {\em Usability Engineering}.
+\newblock Morgan Kaufmann, 1993.
 
 \bibitem{isabelle1}
 Nipkow, T., Wenzel, M., and Paulson, L.~C.

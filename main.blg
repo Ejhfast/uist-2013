@@ -6,45 +6,45 @@ Database file #1: actual.bib
 Warning--entry type for "suppes-prover" isn't style-file defined
 --line 54 of file actual.bib
 Warning--I didn't find a database entry for "fixme"
-You've used 20 entries,
+You've used 24 entries,
             2243 wiz_defined-function locations,
-            660 strings with 7539 characters,
-and the built_in function-call counts, 6166 in all, are:
-= -- 577
-> -- 285
+            681 strings with 8129 characters,
+and the built_in function-call counts, 7432 in all, are:
+= -- 698
+> -- 358
 < -- 0
-+ -- 122
-- -- 98
-* -- 375
-:= -- 971
-add.period$ -- 48
-call.type$ -- 20
-change.case$ -- 108
++ -- 152
+- -- 124
+* -- 473
+:= -- 1191
+add.period$ -- 60
+call.type$ -- 24
+change.case$ -- 132
 chr.to.int$ -- 0
-cite$ -- 20
-duplicate$ -- 230
-empty$ -- 546
-format.name$ -- 98
-if$ -- 1330
+cite$ -- 24
+duplicate$ -- 266
+empty$ -- 638
+format.name$ -- 124
+if$ -- 1583
 int.to.chr$ -- 0
-int.to.str$ -- 20
-missing$ -- 9
-newline$ -- 91
-num.names$ -- 40
-pop$ -- 172
+int.to.str$ -- 24
+missing$ -- 14
+newline$ -- 111
+num.names$ -- 48
+pop$ -- 196
 preamble$ -- 1
-purify$ -- 89
+purify$ -- 110
 quote$ -- 0
-skip$ -- 205
+skip$ -- 227
 stack$ -- 0
-substring$ -- 306
-swap$ -- 58
+substring$ -- 376
+swap$ -- 62
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 78
+type$ -- 92
 warning$ -- 0
-while$ -- 59
-width$ -- 22
-write$ -- 188
+while$ -- 71
+width$ -- 26
+write$ -- 227
 (There were 2 warnings)

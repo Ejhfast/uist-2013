@@ -18,6 +18,8 @@
 %\usepackage{fontspec}
 %\setmainfont{Cardo}
 \usepackage{url}      % llt: nicely formatted URLs
+\usepackage{dblfloatfix}
+\usepackage{caption}
 
 % llt: Define a global style for URLs, rather that the default one
 \makeatletter
@@ -61,23 +63,30 @@ breaklinks=true,
 % End of preamble. Here it comes the document.
 \begin{document}
 
-\title{DeduceIt! Automatically Guiding Students through Derivations in a Massively Open On-line Course}
+\title{DeduceIt! Automatically Guiding Students through Derivations in a Massively Open Online Course}
 
 \numberofauthors{1}
 \author{
-  \alignauthor Ethan Fast, Colleen Lee, Michael Bernstein, Daphne Koller, Alex Aiken\\
+  \alignauthor Ethan Fast, Colleen Lee, Alex Aiken, Daphne Koller, Michael Bernstein, Eric Smith\\
     \affaddr{Stanford University}\\
-    \email{\{ethan.fast, clee0, msb, koller, aiken\}@cs.stanford.edu}\\
+    \email{\{ethan.fast, clee0, aiken, koller, msb, eric\}@cs.stanford.edu}\\
 }
 
 \maketitle
 
+\begin{figure*}[ht!]
+\centering
+\includegraphics[width=1\textwidth]{splash3}
+\caption{The DeduceIt interface: (a) set of available rules (b) interactive derivation component (c) set of given assumptions}
+\label{fig:splash}
+\end{figure*}
+
 \begin{abstract}
-This paper presents DeduceIt, a derivation checking system for massively open on-line courses. DeduceIt is a general system for creating and grading student assignments---it guides students through exercises which can be defined by instructors across arbitrary formal domains---but unlike other interactive theorem provers, it presents a web-based interface accessible to non-expert users, and it can be used by instructors and students without prior training. DeduceIt also introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We describe our experience using DeduceIt and evaluate the system with data collected from thousands of students in an on-line class.
+We present DeduceIt, a derivation checking system for massively open online courses. DeduceIt is a general system for creating and grading student assignments; it guides students through exercises which can be defined by instructors across arbitrary formal domains. However, unlike other interactive theorem provers DeduceIt is a scalable online system, accessible to many thousands of students on the web, and it allows instructors to specify the level of abstraction at which each assignment may be completed (i.e. students may elide steps which are didactically unimportant to a derivation). Further, to deal with the high computational cost of checking derivations DeduceIt introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We describe our experience using DeduceIt and evaluate the system with data collected from thousands of students in an online class.
 \end{abstract}
 
 \keywords{
-	\textcolor{red}{What keywords to use?}
+	MOOC, theorem prover, formal logic, online education
 }
 
 \category{H.5.m.}{Information Interfaces and Presentation (e.g. HCI)}{Miscellaneous}
@@ -86,78 +95,81 @@ This paper presents DeduceIt, a derivation checking system for massively open on
 % \textcolor{red}{Mandatory}
 
 \terms{
-	Human Factors; Design; Measurement. 
+	Human Factors; Design 
 }
 
 % \url{http://www.sheridanprinting.com/sigchi/generalterms.htm}.
 % \textcolor{red}{Optional section to be included in your final version.}
 
 \section{Introduction}
-As instructors begin to teach hundreds of thousands of students in on-line classrooms, it becomes increasingly difficult for them to grade complex assignments and provide students with personal feedback. Here, the rise of massively open on-line courses (MOOCs) presents a departure from the standard educational model: TAs are not designed to scale. 
+As instructors begin to teach hundreds of thousands of students in online classrooms, it becomes increasingly difficult for them to grade complex assignments and provide students with personal feedback. When an online course becomes larger, the attention of its instructors and TAs necessarily becomes more scarce. Course staff are unable to provide so many students---to date the largest MOOC has enrolled more than 180,000 \cite{enroll}---with feedback on their assignments; much less to present this feedback in real-time. 
 
-% In some ways this is not a problem. Often when one student is stuck on an assignment, or fails to understand a lecture, another more knowledgable student will step in to help. Our experience instructing an on-line Compilers class suggests that communities form dynamically around on-line courses, providing students with an emergent network of peer support.
+In particular, for a sufficiently large MOOC it becomes impossible to assign grades to student assignments unless grading is automated. Sometimes this is straightforward, as in the case of an assignment with a single right answer which can be represented as a string or integer value. But many common homework assignments are much less accessible to automation, like english essays, computer programs, or the formal proofs of predicate logic, type checking, or statistics. In general, automated grading is often hard to achieve in complex domains where students may construct correct solutions in many different ways \cite{automated-scoring-design, automated-grading}. 
 
-% However, student communities cannot entirely replace the roles Professors and TAs. Even the most capable of students will tend to lack the domain knowledge of the instructor, and when feedback occurs---usually on some kind of forum--
+This paper addresses the design of a system built to automatically evaluate assignments which are \textit{derivations}: sequences of logical steps where each step follows from some number of its predecessors. Technical, mathematical, or scientific subjects often assign such derivations in their problem sets \cite{fixme}.
 
-When the size of an on-line course increases, the attention of its instructors and TAs necessarily becomes more scarce. They are unable to provide large numbers of students---to date the largest MOOC has enrolled more than 180,000 \cite{enroll}---with feedback on their assignments; much less to present it in real-time. In particular, grading becomes intractable unless it is automated. But automation is often hard to achieve, particularly in complex domains where students may construct correct solutions in many different ways. \cite{automated-scoring-design, automated-grading}
+Notably, grading is not our only concern. It is usually difficult to automate \textit{constructive assignment feedback}---guidance with respect to the cause of student error or success---regardless of whether an assignment can be graded automatically. Simple grading systems can tell a student whether an answer is correct (e.g. through multiple choice or string matching), but they don't know enough about the student's reasoning to provide guidance in the event that an answer is wrong. On the other hand, a system which attempts to evaluate a richer form of answer---say, an entire derivation---might in theory be capable of providing constructive feedback, but remains constrained by the complexity of the domain; what kind of feedback should it provide a student, and when? 
 
-These constraints are important limitations to the MOOC model. Students tend to learn better when subject to tight and personal feedback loops \cite{personalized-feedback} and many subjects, when taken in a traditional class setting, grade students on proofs or derivations where there are many ways to describe a correct answer.
+In either case, automating constructive feedback is a difficult problem and an important current limitation of the MOOC model. Students tend to learn better when subject to tight and personal feedback loops \cite{personalized-feedback, derivation-scoring}: an interaction facilitated by a human TAs in a traditional course setting. A good system would be able to tell students in \textit{real-time} where they made a mistake; a better system would also be able to provide \textit{constructive} suggestions which enhance learning.
 
-MOOC platforms have attempted to automate away some of these issues, but providing thousands of students with \textit{constructive} and \textit{real-time} feedback has remained an unsolved problem. \cite{derivation-scoring} Coursera and Udacity give instructors out-of-the-box tools to build assignments and quizzes with automated grading features, but these tools lack flexibility: evaluation is constrained to discrete, instructor-specified solutions and offers students a limited feedback loop (e.g. ``correct," or ``incorrect"). \cite{fixme} For technical, mathematical, or scientific domains where assignment solutions are often \textit{derivations}---many-staged and prone to individual variation---this limitation is particularly problematic. \cite{derivation-scoring} And other related research suggests that as a system departs further from a traditional ``pen and paper" interface, a greater cognitive load is placed upon the student. \cite{interface-learning-load}
+MOOC platforms have attempted to address some of these issues, but their solutions are limited. Coursera and Udacity give instructors out-of-the-box tools to build assignments and quizzes with automated grading features, but these tools constrain assignments to discrete, instructor-specified solutions and offer students a limited feedback loop which is realtime but generally not constructive (e.g. a response of ``correct'' or ``incorrect'') \cite{fixme}. For derivations this limitation is problematic; as we will see, they are prone to a great deal of variation, and often have many right answers \cite{derivation-scoring}. 
+
+Interface design is also a concern for these systems. \textit{Oviatt et. al} suggest that as a system departs further from a traditional ``pen and paper" interface, a greater cognitive load is placed upon the student \cite{interface-learning-load}. This again suggests that systems which rely upon simplifications to an assignment's answer domain (e.g. multiple choice, or a single solution field) are not ideal for working through a derivation.
+
+Finally, supposing we find an automated system which successfully deals with these issues---providing generality across derivations, feedback which is both constructive and real-time, and an interface which minimizes cognitive load---one hurdle will remain: to be useful in a MOOC, a system must also be \textit{accessible}, capable of handling a workload of many simultaneous students. That is, the system must scale. Since we are concerned with a system designed to work with derivations, this constraint is particularly important; checking formal logic is usually an expensive computation \cite{fixme}.
 
 To address these limitations we present:
 %(e.g. in our Compilers course we use it to assign problems in type checking, regular expressions, finite automata, and many other topics; its generality allows its use in most formal systems).
 \begin{itemize}
-\item The \textit{DeduceIt} system: A web-based framework in which it is possible to specify a general class of derivation exercises, yet which remains accessible non-expert users. DeduceIt provides students with constructive and real-time feedback.
+\item The \textit{DeduceIt} system: A web-based framework which allows instructors to to specify a general class of derivation exercises, scales to a workload of thousands of students, and enables students to complete assignments at varied levels of abstraction. DeduceIt provides students with constructive and real-time feedback.
 \item The idea of a \textit{proof cache}: A novel data structure which records the history of every attempted derivation, reusing computations from previously derived steps to provide predictable performance under heavy load and enable real-time feedback on student progress. We show this cache can increase system efficiency by several orders of magnitude.
-\item An \textit{empirical evaluation} of DeduceIt: A report on the data we have collected from a massive on-line class with thousands of students doing dozens of exercises.
+\item An \textit{empirical evaluation} of DeduceIt: A report on the data we have collected from a massive online class with thousands of students doing dozens of exercises.
 \end{itemize}
 
-The rest of this paper is organized as follows: We begin with related work and a motivating example, then present DeduceIt's interface and capabilities. Next, we describe the underlying architecture of the system and provide an empirical evaluation, using data collected from students in an on-line class. We close with reflections, conclusions, and future work.
+The rest of this paper is organized as follows: We begin with related work and a motivating example, then we present DeduceIt's interface and capabilities. Next, we describe the implementation of the system and provide an empirical evaluation, using data collected from students in an online class. We close with reflections, conclusions, and future work.
 
 \section{Related Work}
-At its core, DeduceIt is an interactive proof solving system, and there exists quite a bit of related work on this subject. Many existing tools already provide users with rich and automated feedback as a form of proof assistance \cite{coq,maude,isabelle, isabelle1,lisp-logic}, but these tools are designed for experts and are generally unsuited to the MOOC audience. For instance, tools like \textit{coq} and \textit{isabelle} allow users to explore complex problem domains (e.g. isabelle has been used to encode ideas as nuanced as Godel's Incompleteness Theorem), but their interfaces are not designed to be accessible to lay students or---depending on the course in question---even to a typical instructor. 
+At its core, DeduceIt is an interactive proof solving system. Many existing tools provide users with rich and automated feedback as a form of proof assistance \cite{coq,maude,isabelle, isabelle1,lisp-logic}, but these tools provide unconstrained interfaces which are generally unsuited to the MOOC audience. For instance, tools like \textit{coq} and \textit{isabelle} allow users to explore complex problem domains in a terminal-like environment, but these interfaces require knowledge of an underlying programming language which is not usually accessible to lay students or, depending on the course in question, even to a typical instructor. Thus, while these tools are useful and expressive---isabelle has been used to encode ideas as nuanced as Godel's Incompleteness Theorem---they require too much background knowledge for the general educational context.
 
-Some prior work has looked specifically at applying automated theorem provers in an educational context. \cite{suppes, suppes-prover} In fact, DeduceIt draws a great deal on the insights of researches like \textit{Suppes}, and the idea of using theorem provers to enable education has engendered much discussion among researchers. \cite{automated-grading, automated-scoring-design} However, even systems designed to address educational use have tended toward complicated interfaces, typically involving unstructured interactions with a terminal-like environment. Moreover, no such system has been deployed at web scale to serve thousands of students. [Fixme: more examples of these systems, if any?]
+Some prior work has looked specifically at applying automated theorem provers in an educational setting \cite{suppes, suppes-prover}. In fact, DeduceIt draws a great deal on the insights of researches like \textit{Suppes}, and the idea of using theorem provers to enable education has engendered much discussion among researchers \cite{automated-grading, automated-scoring-design}. However, even systems designed to address educational use have tended toward interfaces which require a significant amount of outside knowledge; they typically require unstructured interactions with a terminal-like environment. Moreover, no such system has been deployed at web scale to serve thousands of students. [Fixme: more examples of these systems, if any?]
 
-There exists other more domain specific work in automatic feedback and grading systems. Simple forms of automatic grading have been studied in both physical and on-line classrooms [fixme: citation]. These systems tend to restrict an assignment's answer domain with assumptions like multiple choice answers, concrete-valued answers (e.g. answers that match against a string or numerical value), or a set of test cases to evaluate a programming assignment. While restricting the answer domain can work well for certain subjects or applications, in general it does not grant an instructor sufficient means to evaluate more creative or complex assignments. There exist various exceptions here as well: for instance, automated grading and plagiarism detection systems have long evaluated student program code---where solutions may be unstructured and creative---in computer science departments \cite{grade-programs, moss}, and also commercially. We are concerned here with a different kind of system.
+Other work has addressed automatic feedback and grading systems with a more domain specific focus. Simple forms of automatic grading have been studied in both physical and online classrooms \cite{fixme}. These systems tend to restrict an assignment's answer domain with assumptions like multiple choice answers, concrete-valued answers (e.g. answers that match against a string or numerical value), or a set of test cases to evaluate a programming assignment. While restricting the answer domain can work well for certain subjects or applications, in general it does not grant an instructor sufficient means to evaluate more creative or complex assignments. Various exceptions exist here as well: for instance, automated grading and plagiarism detection systems have long evaluated student program code---where solutions may be unstructured and creative---in computer science departments \cite{grade-programs, moss}, and also commercially. However, we are concerned here with less domain-specific solution: a system which works across all kinds of derivations.
 
-Finally, crowdsourcing research has enabled new forms of problem-solving and evaluation. For instance, peer consistency evaluation can be used to effectively judge the accuracy---and grade---of a student's answer, even in the absence of a ground truth \cite{peer-consistency}; crowd-based peer assessment has been successfully applied to grade student assignments \cite{peer-assessment}; and crowds have been used to detect and generate various canonical features of a language, like code snippets for use in an IDE. \cite{crowd-snippets}. While DeduceIt's proof cache draws inspiration from crowd research---the system leverages the results of one student to help another---humans are never directly involved in assignment evaluation. We hope to further involve the crowd in DeduceIt's computations as a subject of future work.
+Finally, crowdsourcing research has enabled new forms of problem-solving and evaluation. For instance, peer consistency evaluation can be used to effectively judge the accuracy---and grade---of a student's answer, even in the absence of a ground truth \cite{peer-consistency}; crowd-based peer assessment has been successfully applied to grade student assignments \cite{peer-assessment, chinmay-srk}; and crowds have been used to detect and generate various canonical features of a language, like code snippets for use in an IDE. \cite{crowd-snippets}. While DeduceIt's proof cache draws inspiration from crowd research---the system leverages the results of one student to help another---humans are never directly involved in assignment evaluation. We hope to further involve the crowd in DeduceIt's computations as a subject of future work.
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{emptyline}
-\caption{A derivation prompts the user to enter another step.}
-\label{fig:emptyline}
-\end{figure}
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=1\columnwidth]{emptyline}
+% \caption{A derivation prompts the user to enter another step.}
+% \label{fig:emptyline}
+% \end{figure}
 
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=1\columnwidth]{regexproof}
+% \caption{A derivation with correct and incorrect steps.}
+% \label{fig:regexproof}
+% \end{figure}
+% 
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=0.7\columnwidth]{selectassumptions}
+% \caption{Selecting assumptions in a derivation. These include the givens and any expressions proven earlier in the derivation.}
+% \label{fig:selectassumptions}
+% \end{figure}
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{regexproof}
-\caption{A derivation with correct and incorrect steps.}
-\label{fig:regexproof}
-\end{figure}
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.7\columnwidth]{selectassumptions}
-\caption{Selecting assumptions in a derivation. These include the givens and any expressions proven earlier in the derivation.}
-\label{fig:selectassumptions}
-\end{figure}
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{rules}
-\caption{The set of rules available to a user.}
-\label{fig:rules}
-\end{figure}
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=1\columnwidth]{rules}
+% \caption{The set of rules available to a user.}
+% \label{fig:rules}
+% \end{figure}
 
 \section{Motivating Example}
 
 To better motivate how DeduceIt works and what problems it solves, we begin with an example assignment from the perspective of a MOOC student in Coursera's Compilers class. This student has recently finished her first week in the course, where she has learned among other things about the properties of regular expressions.
 
-In this particular assignment we ask her to show equality between two regular expressions. Assuming $+$, $*$, and $.$ as union, kleen closure, and concatenation, she must prove:
+In this particular assignment we ask her to show equality between two regular expressions. Assuming $+$, $*$, $\epsilon$, and $.$ as as union, kleen closure, epsilon, and concatenation, she must prove:
 $$(A+B)* \equiv ((B+A).(B+A)*)+\epsilon$$
 More concretely, the assignment asks our student to derive a particular expression. DeduceIt labels this the \textit{goal}: 
 $$((B+A).(B+A)*)+\epsilon$$ 
@@ -168,16 +180,21 @@ Our student also sees a description of the assignment and---perhaps most importa
 To complete a step in the derivation, our student may apply a rule to one or more given expressions, producing a new \textit{conclusion}. As the derivation expands, the conclusion of each previous step is added to the set of givens. DeduceIt can provide several different kinds of feedback on each step, depending on the state of the derivation. Next, we will walk through a few such steps.
 
 \subsection{Completing a Derivation}
-As she reads over the assignment, our student realizes she has only been given one expression from which to start her derivation: $(A+B)∗$. She reasons this must go in the givens input field on the first step. (In fact, this is the only expression DeduceIt allows her to enter in that field). Now she has two input fields left. One asks for a rule; the other a conclusion. To come up with a conclusion, she must decide which rule to apply, and where to apply it. She supposes ``Unfold" looks promising and tries it on the full starting expression, computing:
+As she reads over the assignment, our student realizes she has only been given one expression from which to start her derivation: $(A+B)∗$. She reasons this must go in the givens input field on the first step. (In fact, this is the only expression DeduceIt allows her to enter in that field). Now she has two input fields left. One asks for a rule; the other a conclusion. To come up with a conclusion, she must decide which rule to apply, and where to apply it. She supposes ``Unfold" looks promising and tries it on the full starting expression, mentally computing:
 $$((A + B).(A + B)*)+\epsilon$$
 This expression looks pretty close to her goal, so she enters it in the conclusion input field. After selecting ``Unfold" as her rule, she tells DeduceIt to update her derivation. There is a brief computation, then the derivation returns with her previous step highlighted in green: it was successful. A new step lies below her previous entry---this one is empty---querying her for the next line of the derivation.
 
-Our student now considers her previous conclusion: since it is nearly identical to the goal, she wants to use it for her next step. If she can transform its two sub-expressions $A+B$ to $B+A$, then she will have proven the goal and completed the assignment. While she is pretty sure one property of regular expressions does allow for this kind of transformation, she can't remember what it is called. So she looks through the assignment rules and sees it: Commutativity! Regular expressions are commutative under union.
+Our student now considers her previous conclusion: since it is nearly identical to the goal, she wants to use it for her next step. If she can transform its two sub-expressions $A+B$ to $B+A$, then she will have proven the goal and completed the assignment. While she is pretty sure one property of regular expressions does allow for this kind of transformation, she can't remember what it is called. So she looks through the assignment rules and sees it: Commutativity. Regular expressions are commutative under union.
 
-Mentally, she applies Commutativity to each of the two $A+B$ sub-expressions, then enters her result in the conclusion input box on the next line of the derivation. This conclusion is identical to the goal expression: 
+Now she applies Commutativity to each of the two $A+B$ sub-expressions, then enters her result in the conclusion input box on the next line of the derivation. This conclusion is identical to the goal expression: 
 $$((B+A).(B+A)*)+\epsilon$$
 She selects ``Commutativity" from the rule input box, chooses the conclusion from her previous step $((B+A).(B+A)*)+\epsilon$ as her new given, and tells DeduceIt to  update her proof. DeduceIt checks her derivation, infers through proof search that she means to apply Commutativity twice---on the two appropriate sub-expressions---and responds that the derivation is correct: she has completed this assignment.
 
+This example illustrates several notable aspects of DeduceIt. First, DeduceIt limits the actions available to our student on each step of the derivation. While she may freely enter expressions into the conclusion box of a derivation, the rules and givens fields are constrained, offering a form of guidance. 
+
+Second, in her application of the Commutativity rule, our student interacts with DeduceIt at a relatively high level of abstraction; she is able to apply the rule twice, simultaneously, in a single derivation step. Using a different assignment setup, she might be required to enter each application of Commutativity separately. DeduceIt allows instructors flexibility in defining these sort of behaviors. 
+
+Finally, DeduceIt provides feedback immediately: our student knows right away whether her deductions are valid. This allows her to move from one step to another with confidence that her prior reasoning is correct.
 
 \section{How DeduceIt Works}
 
@@ -193,35 +210,35 @@ While DeduceIt's derivation checker operates primarily as a term rewriting syste
 
 %Fixme: talkabout conditional rules
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{assign_meta}
-\caption{Basic data associated with an assignment.}
-\label{fig:assign_meta}
-\end{figure}
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=1\columnwidth]{assign_meta}
+% \caption{Basic data associated with an assignment.}
+% \label{fig:assign_meta}
+% \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\columnwidth]{rewrite_language}
 \caption{Instructors must specify a rewrite language for each assignment.}
 \label{fig:rewrite_language}
 \end{figure}
 
-\begin{figure}[!h]
+\begin{figure}[ht!]
 \centering
 \includegraphics[width=1\columnwidth]{editruleset}
 \caption{Editing a ruleset on the instructor interface.}
 \label{fig:editruleset}
 \end{figure}
 
-\begin{figure}[!h]
-\centering
-\includegraphics[width=1\columnwidth]{syntax}
-\caption{Adding new syntax on the instructor interface.}
-\label{fig:syntax}
-\end{figure}
+% \begin{figure}[!h]
+% \centering
+% \includegraphics[width=1\columnwidth]{syntax}
+% \caption{Adding new syntax on the instructor interface.}
+% \label{fig:syntax}
+% \end{figure}
 
-\subsection{The instructor view}
+\subsection{Instructor view}
 
 The assignment construction page is the most complex portion of DeduceIt's interface. To create an assignment, an instructor must specify four things: 
   \begin{enumerate}
@@ -235,31 +252,31 @@ A student works through an assignment by starting from the given expressions and
 
 \subsubsection{The Language}
 
-DeduceIt's default language should be familiar to anyone who has used an advanced calculator. It ships with the unary operators $\char`\~$ and $-$, and the binary operators $.$, $\&$, $|$, $,$, $*$, $\backslash$, $+$, $-$, $=$, $\neq$, $\leq$, $\geq$, $<$, $>$, $:=$, and $\rightarrow$ which we list in order of precedence. DeduceIt also supports variables (these may only be used when defining rewrite rules), symbols, and integers. For example, here are three legal expressions in the default rewrite language are: 
-$$\$p,(\$p=>\$q)\rightarrow{}\$q$$ 
-$$a.b.b.a$$
-$$x+2=y$$ 
-Note that with three exceptions (the notation specific to rewrites: $:=$, $\rightarrow$, and $\$$) the operators used in these expressions have no meaning without an accompanying set of rules; they simply determine the parsing of an expression.
+DeduceIt's default language is similar to that of an advanced calculator. It provides the unary operators $\char`\~$ and $-$, and the binary operators $.$, $\&$, $|$, $,$, $*$, $\backslash$, $+$, $-$, $=$, $\neq$, $\leq$, $\geq$, $<$, $>$, $=>$, $:=$, and $\rightarrow$ which we list in order of precedence. DeduceIt also supports variables (these may only be used when defining rewrite rules), symbols, and integers. For example, three legal expressions in the default rewrite language are: $\$p,(\$p=>\$q)\rightarrow{}\$q$ and $a.b.b.a$ and $x+2=y$.
 
-Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and variable argument functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by latex. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g. $\backslash{}sin\{x\}$. Figure \ref{fig:syntax} shows DeduceIt's custom syntax creation view.
+Note that with three exceptions (the notation specific to rewrites: $:=$, $\rightarrow$, and $\$$) the operators used in expressions have no meaning without an accompanying set of rules; they simply determine the parsing of an expression.
+
+Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and variable argument functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by latex. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g. $\backslash{}sin\{x\}$.
 
 \subsubsection{Rulesets}
 
 Rulesets are the most complicated part of an assignment. They define the sets of valid transformations which a student may use in a derivation. Each ruleset has a name, a student-facing description, a set of rewrite rules, and an optional set of constraints. The name and description of a ruleset are all a student sees when using DeduceIt, and these fields  make an assignment more accessible; students do not need to understand rewrite rules to use the system.
 
-Each rewrite rule in a ruleset is either a strict rewrite rule or an equality. To apply a strict rewrite rule, its left side must match exactly on an expression, wheres an equality may be applied to an expression or any of its subexpressions. Take as an example the expression $1+y*y=5$ and the strict rewrite rule $\$x*\$x \rightarrow \$x^2$; here the rewrite rule cannot be applied, since its left side doesn't bind with the entire expression. However, a similar rewrite rule which has been defined with an assumption of equality, $\$x*\$x := \$x^2$, will bind on $y*y$ and produce the transformation $1+y^2=5$. In this way equalities are more powerful than strict rewrite rules, and for many assignments a single equality can take the place of many strict rules. This eases the burden on an instructor and usually speeds up proof search; the more rules an assignment has, the slower search tends to be.
+Each rewrite rule in a ruleset is either a strict rewrite rule or an equality. To apply a strict rewrite rule, its left side must match exactly on an expression, wheres an equality may be applied to an expression or any of its subexpressions. Take as an example the expression $1+y*y=5$ and the strict rewrite rule $\$x*\$x \rightarrow \$x^2$; here the rewrite rule cannot be applied, since its left side doesn't match the entire expression. However, a similar rewrite rule which has been defined with an assumption of equality, $\$x*\$x := \$x^2$, will match $y*y$ and produce the transformation $1+y^2=5$. In this way equalities are more powerful than strict rewrite rules, and for many assignments a single equality can take the place of many strict rules. This eases the burden on an instructor and usually speeds up proof search; the more rules an assignment has, the slower search tends to be.
+
+However, strict rewrite rules cannot be entirely replaced with equalities. Some transformations may be context-dependent (e.g. lexing character values of a string), where equalities are clearly inappropriate. Moreover, strict rewrite rules allow instructors to simulate complex assignment domains which would otherwise lie outside the scope of a typical rewrite rule based system. For instance, we use strict rewrite rules to define a type checking assignment over a specific domain of input $\backslash{}type\{t\}\{expr\}$. Because we tailor such rules specifically to the context of this assignment, we do not need the power of full type analysis: rewrite rules are sufficient. 
 
 Various constraints may be defined on the variable terms used in the ruleset. They operate in a manner similar to conditional rewrite rules, but are somewhat less general; we use only containment---whether or not a variable contains certain other terms---as a condition on ruleset application.
 
-A ruleset may also be either ``required" or ``free." While a required ruleset must be named explicitly when a student uses it in a derivation, a ``free" ruleset may be elided. Behind the scenes, DeduceIt will attempt to fill in such ``free" steps automatically through proof search. This is useful when a student must use trivial transformations which are necessary to the derivation but unimportant to the assignment. For example, a student may want to rearrange terms in a mathematical expression as part of some broader rule application. DeduceIt's ``free" rules allow the student to skip over these steps.  
+A ruleset may also be either ``required" or ``free." While a required ruleset must be named explicitly when a student uses it in a derivation, a free ruleset may be elided. Behind the scenes, DeduceIt will attempt to fill in such free steps automatically through proof search. This is useful when a student must use trivial transformations which are necessary to the derivation but unimportant to the assignment. For example, a student may want to collapse terms in a mathematical expression as part of some broader rule application. Consider a rewrite rule defining integration $\int{a^x} \rightarrow a^{x+1}/(x+1)$ and the given expression $\int{(a^2+0)}$ along with other rewrite rules governing basic algebra. A student might try to complete the integration immediately, deriving $a^3/3$, without computing the intermediate step $\$x+0 \rightarrow \$x$, which requires the addition property of zero. If an instructor marks the rewrite rule which governs the addition property of zero as free, DeduceIt will allow the student to skip this intermediate step, filling it in through proof search.
 
-In figure \ref{fig:editruleset} we show DeduceIt's Ruleset creation view.
+In Figure \ref{fig:editruleset} we show DeduceIt's Ruleset creation view.
 
 \subsubsection{Sharing Rewrite Languages}
 
 Some rewrite languages are common enough that it makes sense to share them among different assignments: for instance, many assignments might use the languages defined for basic algebraic manipulation, predicate logic, or the expansion of regular expressions. DeduceIt allows instructors to reuse a rewrite language across assignments.
 
-\begin{figure}[!h]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=1\columnwidth]{nodeannote}
 \caption{Annotating a node on the proof tree.}
@@ -268,10 +285,10 @@ Some rewrite languages are common enough that it makes sense to share them among
 
 \subsubsection{The Assignment Proof Tree}
 
-For each assignment, an instructor has real-time access to its proof tree. This tree tracks the history of all derivations associated with the assignment. These derivations share a common root node, and each step in a derivation maps to one of its children, the immediate parent of which is either the root node itself or else a node associated with the previously derived step. Every node keeps track of derivation state information and a count of how many students have traversed it. An instructor may annotate any node in the tree with hints, and these will be visible to a student if she enters upon that path in her own derivation. An instructor may also use this tree to override the behavior of the underlying derivation checker, e.g. forcibly label a given derivation step valid. This can be useful for steps which make use of particularly long chains of free rules which can't be discovered and verified by proof search.
+For each assignment, an instructor has real-time access to its proof tree. This tree tracks the history of all derivations associated with the assignment. These derivations share a common root node, and each step in a derivation maps to one of its children, the immediate parent of which is either the root node itself or else a node associated with the previously derived step. Every node keeps track of derivation state information and a count of how many students have traversed it. An instructor may annotate any node in the tree with hints, and these will be visible to a student if she enters upon that path in her own derivation. An instructor may also use this tree to override the behavior of the underlying derivation checker, e.g. forcibly label a given derivation step valid. This can be useful for steps which make use of particularly long chains of free rules that aren't discovered and verified because of limitations in proof search.
 
 
-\subsection{The student view}
+\subsection{Student view}
 
 An assignment's student view presents the information we have already encountered on the instructor interface. At the top of the page a title, goal, and description broadly introduce the exercise at hand. Below these are the given expressions---a student uses one or more of these to start the derivation---and some number of rulesets divided into two types: required and free. Rulesets may be (and usually are) composed of many separate rewrite rules, but an assignment presents them as single, discrete entities; students need not be familiar with rewriting systems to use DeduceIt. In fact, the term `rewrite' cannot be found anywhere on the student view, and these rulesets are themselves labeled on the page simply as `rules'. This might create a leaky abstraction if rulesets are not carefully specified (i.e. the instructor description does not exactly match the behavior specified by the underlying rewrites), but most students are not familiar with rewrite rules, and we have discovered that a small sacrifice of precision in the rules positively impacts usability, as reported by several students.
 
@@ -279,50 +296,48 @@ An assignment's student view presents the information we have already encountere
 
 Each assignment page contains an interactive derivation. Before a student has made progress in an assignment this derivation consists of only three empty input fields which are labeled: conclusion, rule, and givens. To more forward in a derivation, a student must derive a conclusion by applying the selected rule on the selected givens(s). 
 
-This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or which are members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constrains eliminate the possibility of many simple mistakes, like mistypings, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
+This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or which are members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constraints eliminate the possibility of many simple mistakes, like mistypings, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
 
-To verify the current state of a derivation, students must click on the button ``Update Proof." DeduceIt will respond with one of several kinds of feedback: if the derivation is so far valid, all its steps will turn green; if the system cannot parse the conclusion of some step in the derivation, that step will turn yellow; or if the system can parse but not prove the conclusion of some step in the derivation, that step will turn red. Each valid step preceding an invalid step will remain green, and if an invalid step has any hint annotations on the assignment Proof Tree, hints appear adjacent to that step. Hints take the form of a styled question mark, which expands into text on mouseover. Finally, if the conclusion of the latest step is equivalent to the goal expression, DeduceIt signals the assignment is finished with a large checkmark and does not prompt a new step in the derivation.
+To verify the current state of a derivation, students must click on the button ``Update Proof." DeduceIt responds with one of several kinds of feedback: if the derivation is so far valid, all its steps will turn green; if the system cannot parse the conclusion of some step in the derivation, that step will turn yellow; or if the system can parse but not prove the conclusion of some step in the derivation, that step will turn red. Each valid step preceding an invalid step will remain green, and if an invalid step has any hint annotations on the assignment proof tree, hints appear adjacent to that step. Hints take the form of a question mark, which expands into text on mouseover. Finally, if the conclusion of the latest step is equivalent to the goal expression, DeduceIt signals the assignment is finished with a large checkmark and does not prompt a new step in the derivation.
 
 \subsection{Extensions to the Derivation Interface}
 
-We experimented with several other forms of derivation feedback which we have not yet deployed for our on-line class.
+We experimented with several other forms of derivation feedback which we have not yet deployed for our online class.
 
 \subsubsection{Surfacing the Proof Path}
 
 DeduceIt maintains aggregate data about every derivation, so the system knows when students are proceeding down well-traveled paths in a derivation, or down correct but---so far---more lengthy paths, or down paths which have not yet led to the goal. One version of DeduceIt surfaces this information with a status indicator, a colored circle of green, yellow, or orange at the top of the derivation, indicating whether students are on a common path, an uncommon but successful path, or an as yet unsuccessful path. 
 
-From anecdotal feedback, it seems students find this indicator helpful, and in theory DeduceIt could provide students even finer grain information: the exact number of other successful or unsuccessful students who have worked to the current state of their derivation; or detection of the exact step in their derivation where they left the well-traveled path. It is also possible to further process the Proof Tree. By collapsing some nodes which are syntactically different but semantically equivalent (e.g. the expressions $(1+2)+3$ and $1+(2+3)$ in a calculus assignment) DeduceIt could construct a more meaningful notion of a derivation path.
+From anecdotal feedback, it seems students find this indicator helpful, and DeduceIt could provide students even finer grain information: the exact number of other successful or unsuccessful students who have worked to the current state of their derivation; or detection of the exact step in their derivation where they left the well-traveled path. It is also possible to further process the Proof Tree. By collapsing some nodes which are syntactically different but semantically equivalent (e.g. the expressions $(1+2)+3$ and $1+(2+3)$ in a calculus assignment) DeduceIt could construct a more meaningful notion of a derivation path.
 
 \subsubsection{Providing Automatic Hints}
 
 DeduceIt allows instructors to set up hints for any derivation step by annotating an assignment's proof tree. However, we built another version of DeduceIt that constructs these hints automatically using proof search. In this second implementation, DeduceIt holds the rule and assumption fields constant and searches for alternative valid conclusions. 
 
-For instance, suppose a student enters $x=3+1$, \textit{Balance Equation}, and $x+1=3$ in the respective fields for conclusion, rule, and assumptions. This is an incorrect step, so DeduceIt will highlight it in red. And in the standard version of DeduceIt, if an instructor has not annotated this step on the proof tree, this is all the system will do. The student will not be given any further direction; she knows only the step is wrong. However, the hint-generating DeduceIt is able to give her more specific feedback, e.g. ``Your conclusion is incorrect." In this example proof search finds a viable alternative conclusion, $x=3-1$, which matches the rule and assumption the student entered, so DeduceIt knows it is possible to apply the selected rule upon the selected assumptions.
+For instance, suppose a student enters $x=3+1$, \textit{Balance Equation}, and $x+1=3$ in the respective fields for conclusion, rule, and assumptions. This is an incorrect step, so DeduceIt will highlight it in red. And in the standard version of DeduceIt, if an instructor has not annotated this step on the proof tree, this is all the system will do. The student will not be given any further direction; she knows only the step is wrong. However, the hint-generating DeduceIt is able to give her more specific feedback, e.g. ``Check the sign of your transformation." In this example proof search finds a viable alternative conclusion, $x=3-1$, which matches the rule and assumption the student entered, so DeduceIt knows it is possible to apply the selected rule upon the selected assumptions.
 
 Other hint-generating systems might hold constant different parts of the derivation (e.g. searching for rules and assumptions to match a given conclusion), or leverage the Proof Tree to provide students with hints particular to common derivation paths. It is important to us that the system provide useful hints without giving away too much information: a tricky balance to achieve in an automated system. Hint generation is the subject of ongoing work.
 
-\section{The Internals of DeduceIt}
+\section{Implementation and Proof Cache}
 
 
-DeduceIt is a system formed of three distinct components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors) as described in the previous section, the backend theorem prover exposes an on-line API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the Proof Cache.
+DeduceIt is a system formed of three distinct components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors) as described in the previous section, the backend theorem prover exposes an online API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the various proof trees which will together constitute the proof cache.
 
 We built these components using several technologies and cloud providers. The frontend is a Ruby on Rails web application deployed on Heroku, the backend is a Haskell application also deployed on Heroku, and the database is a MongoDB installation running on MongoHQ. Each of these components can be scaled to serve arbitrary numbers of students.
 
 \subsection{The Theorem Prover}
 
-To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e. named groups of rewrite rules), equalities, dynamic evaluation for some term expressions, and containment conditions on the application of certain rewrites. We discussed each of these features in the previous section. 
+To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e. named groups of rewrite rules), equalities, dynamic evaluation for some term expressions, and containment conditions on the application of certain rewrites (recall Section 3).
 
-DeduceIt's theorem prover also includes a parser which the system constructs dynamically, per API call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct an API call into expression terms of the rewrite language, before it passes these terms to the prover.
+DeduceIt's theorem prover also includes a parser which the system constructs dynamically on each theorem prover call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct the arguments of a theorem prover call into expression terms of the rewrite language before it passes these terms to the prover.
 
 \subsubsection{The Theorem Prover API}
 
-The DeduceIt prover is wrapped in web server which can be queried via API on the following POST parameters: \textit{rulesets}, \textit{assumptions}, \textit{syntax}, and \textit{conclusion}. To every query the prover will respond with either ``proven", ``unproven'', or ``syntax error.'' The frontend uses this API to assess the validity of each step in a derivation.
+The DeduceIt prover is wrapped in a web server which can be queried via an API over the following arguments: \textit{rulesets}, \textit{assumptions}, \textit{syntax}, and \textit{conclusion}. To every query the prover will respond with either ``proven", ``unproven'', or ``syntax error.'' The frontend uses this API to assess the validity of each step in a derivation.
 
-The API parameters function much as their names suggest. The \textit{syntax} parameter defines any new syntax on the default rewrite language. The rest of the parameters are used for proof search: DeduceIt tries to prove the provided \textit{conclusion} expression using the set of rewrite rules defined in \textit{rulesets} on the starting expressions in \textit{assumptions} (that is, assuming all these parameters parse). 
+These arguments function much as their names suggest. The \textit{syntax} argument defines any new syntax on the default rewrite language. The rest of the parameters are used for proof search: DeduceIt tries to prove the provided \textit{conclusion} expression using the set of rewrite rules defined in \textit{rulesets} on the starting expressions in \textit{assumptions} (that is, assuming all these parameters parse). 
 
-Although in the previous section we mentioned a student can select only one ruleset for each step of a derivation, it is usually necessary to pass the backend prover more than one. This is necessary because the prover requires not only the ruleset selected on the given step, but also any other rulesets which are declared ``free." Free rulesets are always allowed for any step of the derivation; in general they tend to be common or trivial transformations, orthogonal to the didactic goals of an assignment. 
-
-In [fixme] we show an example API query.
+Although in the previous section we mentioned a student can select only one ruleset for each step of a derivation, it is usually necessary to pass the backend prover more than one ruleset, because the prover requires not only the ruleset selected on the given step, but also any other rulesets which are declared ``free." Free rulesets are always allowed for any step of the derivation; in general they tend to be common or trivial transformations, orthogonal to the didactic goals of an assignment. 
 
 \subsubsection{Proof Search}
 
@@ -330,38 +345,41 @@ In DeduceIt, proof search works by applying rewrite rules iteratively upon a gro
 
 For example, suppose we give DeduceIt the assumption $a$, the rewrite rule $a \rightarrow a.a$, and the conclusion $a.a.a$. The system may conduct a forward search: start from $a$ and apply the rule twice, first producing $a.a$ and then $a.a.a$. Or it may search backward: construct a new rule $a.a \rightarrow a$ (the inverse of the old rule) and start from $a.a.a$, and then apply this new rule twice to produce $a.a$ and then $a$. Either method leads the system to declare the step valid.
 
-In practice, DeduceIt conducts one round of forward search and one round of backward search; the two rounds of search then meet in the middle, i.e. they check for terms generated in common. We introduce backward search to ensure DeduceIt will correctly check rewrite languages which allow the introduction of new symbols, e.g. predicate logic and the rule $\$a \rightarrow \$a \vee \$b$ (note here that $\$b$ is a variable in the rewrite rule which binds to \textit{any expression}, so forward search cannot enumerate every possible value of $\$b$). Moreover, the meet in the middle approach tends to be more effective than two rounds of only forward or backward search. 
+In practice, DeduceIt conducts one round of forward search and one round of backward search; the two rounds of search then meet in the middle, i.e. they check for terms generated in common. We introduce backward search to ensure DeduceIt will correctly check rewrite languages which allow the introduction of new symbols, e.g. predicate logic and the rule $\$a \rightarrow \$a \vee \$b$ (note here that $\$b$ is a variable in the rewrite rule which binds to \textit{any expression}, so forward search cannot enumerate every possible value of $\$b$). Moreover, the meet in the middle approach tends to be more effective than two rounds of only forward or backward search \cite{bisearch}.
 
-We find the system is limited to two rounds of search under reasonable time constraints: an upper bound of 4 seconds, for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. 
+We find the system is limited to two rounds of search under reasonable time constraints: an upper bound of 4 seconds, for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. Notably, this delay falls into the third classification of Neilsen's work on response times, beneath the limit for keeping a user focused on his or her dialog with the system \cite{neilsen}, and our theorem prover is a prototype and could be made much more efficient. Even so, DeduceIt can do better as we will see in the next section. 
 
 \subsection{The Proof Cache}
 
-The proof cache is a data structure DeduceIt uses to track all responses the frontend application receives from the prover. This cache is composed of many proof trees, one for each assignment, and together these proof trees track the aggregate history of every attempted derivation (as we discussed in the previous section). Proof trees are useful enough for managing assignments---through them an instructor can annotate derivation steps and override the default behavior of the prover---but they can also, by acting as a cache, potentially improve the overall performance of the system. To check a new derivation step using the proof cache, DeduceIt walks down the proof tree associated with that derivation's assignment: if the new step already exists in the tree, then the system doesn't need to query the prover; it simply returns the stored result.
+The proof cache is a data structure DeduceIt uses to track all responses the frontend application receives from the prover. This cache is composed of many proof trees, one for each assignment, and together these proof trees track the aggregate history of every attempted derivation (as we discussed in Section 3). Proof trees are a useful tool for managing assignments---through them an instructor can annotate derivation steps and override the default behavior of the prover---but they can also, by acting as a cache, dramatically improve the overall performance of the system. 
 
-We formed two hypotheses about the proof cache:
+DeduceIt's bottleneck is in its prover; proof search is by far the most computationally expensive aspect of the system. A proof cache can limit the outbound queries to the prover and so, intuitively, increase the performance of the system. 
+
+To check a new derivation step using the proof cache, DeduceIt walks down the proof tree associated with that derivation's assignment: if the new step already exists in the tree, then the system doesn't need to query the prover; it simply returns the stored result.
+
+Besides the benefits of providing an infrastructure for hints and a summary of how well students are doing in an assignment, the proof cache has a very significant performance benefit for two reasons:
 \begin{enumerate}
-  \item Students tend to complete their derivations in similar ways; that is, they follow similar paths through an assignment's proof tree.
-  \item It is more efficient to reuse the intermediate results of one student's derivation to check the validity of another student's derivation, when compared to checking every derivation step with the prover. 
+  \item Most students complete derivations with steps that other students have used previously or steps that will be used by future students.
+  \item It is more efficient to reuse the intermediate results of one student's derivation to check the validity of another student's derivation than to check every derivation step with the prover. \label{hyp:2}
 \end{enumerate}  
-  The second hypothesis seemed particularly likely to us since the cost of a checking a step with the prover is much higher than the cost of looking up a result in the cache. An average prover API query takes $4000ms$, whereas a typical cache lookup takes only $900ms$ seconds. We evaluate the performance impact of the proof cache more fully in the next section.
+An average prover call takes $4000ms$, whereas a typical cache lookup takes only $600ms$ seconds. Notably, this is an improvement which moves DeduceIt up a level on Neilsen's scale of responsiveness, to the level at which a user's flow of thought is uninterrupted \cite{neilsen}. We evaluate the performance impact of the proof cache more fully in the next section.
 
 \section{Evaluation}
 
-To better evaluate DeduceIt's usefulness, we deployed it in the winter offering of Coursera's \textit{Compilers} class, where we assigned each student several DeduceIt problems for every week of the course. Out of the 7625 students who enrolled, 1788 of them participated actively, and 1000 (fixme) of these students completed at least one DeduceIt assignment.
+To evaluate DeduceIt we deployed it in the winter offering of Coursera's \textit{Compilers} class, where we assigned each student several DeduceIt problems in every week of the course. Out of the 7625 students who enrolled, 1788 of them participated actively, and 971 of these students completed at least one DeduceIt assignment. Overall system latency was $900ms$ on average, with an average of $X$ requests per minute.
 
-In this section we analyze several aspects of the DeduceIt system. We begin with a broad measure of system performance, and then for ten DeduceIt assignments we analyze the distribution of students' time spent on derivations, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache. Finally, we take a closer look at three assignments, to provide an example of the new kinds of analyses that DeduceIt enables.
+In this section we provide evidence for two claims:
 
-\subsection{System Performance}
-
-In the first experiment, we measure the relation between system latency and load. Since a MOOC will typically enroll thousands of students, it is important that DeduceIt maintain responsiveness when visited concurrently by many users. 
-
-Our analytics show DeduceIt receives one incoming request per minute on average. However, at peak load---usually associated with an assignment deadline---the application may receive up to $X$ incoming requests per minute. Since DeduceIt runs on a cloud provider, we can add necessary resources on demand to handle this additional traffic. 
-
-Over the length of the course, DeduceIt's average latency was $900ms$. At times of peak load, this latency was $1100ms$. 
+\begin{enumerate}
+  \item \textit{DeduceIt successfully guides students through derivations}. We show through data analysis and anecdotal feedback that students are engaging with the system.
+  \item \textit{DeduceIt can provide instructors with insights that translate into future course improvements}. Here we provide examples from our personal experience with the Compilers course. 
+\end{enumerate}
+  
+We run several analyses over ten DeduceIt assignments, measuring the distribution of students' time spent on assignments and derivation steps, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=1\columnwidth]{distributions}
+\includegraphics[width=1\columnwidth]{hist_big}
 \caption{We construct normalized histograms to show the student time distributions for each assignment. The x-axis measures time in minutes.}
 \label{fig:distributions}
 \end{figure}
@@ -371,79 +389,132 @@ Over the length of the course, DeduceIt's average latency was $900ms$. At times 
     \hline
     \tabhead{Assignment Name} & \tabhead{Success} & \tabhead{Valid} & \tabhead{Syntax} & \tabhead{Semantic} \\
     \hline
-    Regular Expressions I & 96 & 55 & 11 & 34 \\
+    Regular Expressions I & 96\% & 55\% & 11\% & 34\% \\
     \hline
-    Lexical Analysis II & 97 & 63 & 6 & 30 \\
+    Lexical Analysis II & 97\% & 63\% & 6\% & 30\% \\
     \hline
-    Finite Automata I & 98 & 73 & 3 & 23 \\
+    Finite Automata I & 98\% & 73\% & 3\% & 23\% \\
     \hline
-    Leftmost Derivation & 95 & 56 & 6 & 38 \\
+    Leftmost Derivation & 95\% & 56\% & 6\% & 38\% \\
     \hline
-    Rightmost Derivation & 98 & 81  & 1 & 17 \\
+    Rightmost Derivation & 98\% & 81\%  & 1\% & 17\% \\
     \hline
-    More Derivations & 99 & 81 & 1 & 18 \\
+    More Derivations & 99\% & 81\% & 1\% & 18\% \\
     \hline
-    Recursive Descent Parsing & 96 & 69 & 1 & 29 \\
+    Recursive Descent Parsing & 96\% & 69\% & 1\% & 29\% \\
     \hline
-    LL(1) Parsing & 99 & 83 & 1 & 15 \\
+    LL(1) Parsing & 99\% & 83\% & 1\% & 15\% \\
     \hline
-    Shift-Reduce Parsing & 94 & 85 & 2 & 12 \\
+    Shift-Reduce Parsing & 94\% & 85\% & 2\% & 12\% \\
     \hline
-    SLR(1) Parsing & 93 & 60 & 2 & 36 \\
+    SLR(1) Parsing & 93\% & 60\% & 2\% & 36\% \\
     \hline
   \end{tabular}
   \caption{We measure student success rates for each assignment and the corresponding student error rates, broken down into syntax errors and semantic errors.}
   \label{tab:table1}
 \end{table}
 
-\subsection{Student Time Distributions}
+\subsection{Assignment Time Distributions}
 
-In the second experiment, we analyzed the amount of time students spent on each derivation. Our results are displayed in figure \ref{fig:distributions}. These time distributions are approximately normal and centered upon a fixed time value which tracks loosely with an assignment's difficulty. For example, in the Rightmost Derivation assignment students are clustered around $4$ minutes, and in the Shift-Reduce Parsing assignment they are clustered around $10$ minutes; the Rightmost Derivation assignment was generally considered easier by students than the Shift-Reduce Parsing assignment. This relation also holds true among the remainder of the assignments.
+First, we analyze the amount of time students spent on each assignment. Our results are displayed in Figure \ref{fig:distributions}. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty. For example, in the \textit{Rightmost Derivation} assignment students are clustered around $4$ minutes, and in the \textit{Shift-Reduce Parsing} assignment they are clustered around $10$ minutes; the \textit{Rightmost Derivation} assignment is generally considered easier by students than the \textit{Shift-Reduce Parsing} assignment. This relation holds true among the remainder of the assignments. In general, we are heartened by the speed at which most students completed even the harder derivations.
 
-As instructors, we were heartened by the speed at which most students completed even the harder assignments like Shift-Reduce parsing. We were also pleasantly surprised by student success rates, as we will see in the next section.
+\subsection{Rule Time Distributions}
+
+We also observe the time distribution which governs rule application across assignments. Supposing some rules are easier or more natural to apply than others, we can use DeduceIt to find rules associated with longer elapsed time between steps, revealing what parts of the course material are more likely to confuse students. On average, it takes students 163 seconds to apply a rule in a derivation; that is, around 3 minutes elapses between one derivation step and the next. We found that ``Nonterm Y input plus'' is the rule with the shortest elapsed time between steps (2 seconds), and ``Nonterm Y input end'' is the rule associated with the longest elapsed time (1482 seconds). 
+
+Curiously, both rules come from the same assignment \textit{LL(1) Parsing} and dictate valid operations over a lookup table. However, while ``Nonterm \& input plus'' appears on a correct derivation path, ``Nonterm Y input end'' does not. Most students using the latter rule entered a valid but misleading conclusion on the previous derivation step; such a step is an ideal candidate for hint annotation on the assignment proof tree (e.g. a hint which suggests, ``reconsider this path.'').
+
+For a second use-case of this data, we examine the assignment \textit{Regular Expressions I}. Here, we see the rules ``Left Identity'' and ``Right Identity'' are used by students most quickly, at about 100 seconds between applications. The ``Unfold'' rule is the most slowly used, at approximately 400 seconds in its application. This suggests Unfold may be the most challenging property of regular expressions for students to understand. In general, instructors might use such information to better focus the emphasis of their lectures.
 
 \subsection{Student Success Rates}
 
-In the third experiment, we examined how the success rates of students vary across assignments. Our results are displayed in table \ref{tab:table1}. Success rates are uniformly high across assignments, ranging from $94\%$ to $98\%$, and these rates also track reported assignment difficulty in a manner consistent with time distributions.
-
-We were also curious whether student success rates are correlated with other assignment features. To this end, we formed several hypotheses. First, we predict that student success is more likely when the length of the shortest viable derivation is smaller. Second, we predict the same when an assignment is less complex (e.g. there are fewer rules or assumptions provided in an assignment). We tested several of these hypotheses, as we show in figure \ref{fixme}.
-
-[Fixme: actually test these? What hypotheses do we want to test, if any?]
+Next, we examine the success rates of students across assignments. These results are displayed in table \ref{tab:table1}. Success rates are uniformly high, ranging from $93\%$ to $99\%$, and these rates track reported assignment difficulty in a manner consistent with time distributions. 
 
 \subsection{Student Error Rates}
 
-In the fourth experiment, we look at student error rates. Error rates among derivation steps for all the DeduceIt assignments are substantial, despite the high overall assignment success rates reported in table \ref{tab:table1}. We expected this result; students will always get some things wrong, and learning rarely takes place without error \cite{fixme}. However, ideally we would like to distinguish between two classes of error: errors which stem from a misunderstanding of course material, and errors which stem from misunderstandings associated with the DeduceIt interface.
+We next compute the rate of student mistakes across derivations. Error rates among derivation steps for all the DeduceIt assignments are substantial---on average 29.4\%, or approximately one error for every three correct steps---despite the high overall success rates reported in table \ref{tab:table1}. We expect this result: students will always get some things wrong, and learning rarely takes place without error, whether indeliberate or in the form of exploratory, epistemic action \cite{citeulike}. However, ideally we would like to distinguish between two classes of error: errors which stem from a misunderstanding of course material, and errors which stem from misunderstandings (or exploratory actions) associated with the DeduceIt interface.
 
 To approximate the impact of these two classes of error, we divide student mistakes into two categories: syntax errors, and semantic errors. Syntax errors arise from entering an expression which DeduceIt cannot parse, whereas semantic errors arise from parseable derivation steps which cannot be proven. While semantic errors are certain to contain faulty logic, this is not obviously true for syntax errors: a student might have intended to write a correct step and simply failed to use the system properly. We use the rates of student syntax errors as a proxy for measuring rates of student confusion with the DeduceIt system.
 
-Across all assignments syntax errors are low, never exceeding $11\%$. Notably, the highest rate of syntax errors occurred in the first class assignment, Regular Expression I, despite the fact that students generally considered this assignment the easiest. The syntax error rates of subsequent assignments never exceeded $6\%$, although these later assignments were much more difficult. This suggests that while DeduceIt may have a learning curve, it is probably not a significant barrier to using the system. In general, low overall rates among syntax errors suggest that DeduceIt is not confusing students to the detriment of assignment completion and correctness.
+Across all assignments syntax errors are low, never exceeding $11\%$. Notably, the highest rate of syntax errors occurred in the first class assignment, \textit{Regular Expressions I}, despite the fact that students generally considered this assignment the easiest. The syntax error rates of subsequent assignments never exceeded $6\%$, although these later assignments were much more difficult. In fact, in the last 6 assignments, the average syntax error rate was only 1.3\%. This is likely a result of students learning to use the system. Low overall rates among syntax errors suggest that DeduceIt is not confusing students to the detriment of assignment completion and correctness.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=1\columnwidth]{proofcache}
+\includegraphics[width=1\columnwidth]{cache}
 \caption{We graph cache hit rates against time for all assignments. The x-axis measures the total number of interactions with DeduceIt. The y-axis measures cache hit rates as a percentage.}
 \label{fig:proofcache}
 \end{figure}
 
 \subsection{Performance Impact of the Cache}
+First, we test a hypothesis which provides the general intuition behind the proof cache: \textit{most students complete derivations with steps that other students have already previously or steps that will be used by future students}. To test this hypothesis, we counted the number of unique derivation steps entered into the class assignments. Of 50,099 total steps, only 5,407 (10\%) of them are unique. Since 90\% of derivation steps are reused, the data supports our first hypothesis.
 
-In the final experiment, we measure the impact of DeduceIt's proof cache on overall system efficiency. As we have discussed, the time cost differential between a call to the Prover API and a proof cache lookup is high --- $900ms$ vs $4300ms$. This suggests that as long as the hit rate of the proof cache is also relatively high, the cache will provide the system with enormous time savings. 
+Next, we examine our second hypothesis: \textit{it is more efficient to reuse the intermediate results of one student's derivation to check the validity of another student's derivation than to check every derivation step with the prover}. To test this hypothesis, we measured the proof cache hit rate. In Figure \ref{fig:proofcache}, we show the cache hit rate plotted against time. By the $Xth$ student interaction, the cache has reached a hit rate of $85\%$. Since the average theorem prover call takes $4000ms$ and the average cache lookup takes $600ms$, we can compute an average time of $4000ms*0.15+600ms*.85=1100ms$. This represents a cost savings of 72\% and qualitatively improves usability: running the cache allows DeduceIt to move up one level on Neilsen's hierarchy of responsiveness \cite{neilsen}.
 
-In figure \ref{fig:proofcache}, we show the cache hit rate plotted against time. Although there are some differences in these plots, in each case the proof cache rises to a high hit rate very quickly. In every case, by the $Xth$ student interaction, the cache has reached a hit rate of $85\%$. From this, we can safely accept a $15\%$ hit rate as a lower bound. To measure the overall gain in efficiency from the cache we can compute:
-$$Cache: 4000*0.15 + 1000 = 1600ms$$
-This is meant to be a conservative estimate; the system latency we measure empirically is $900ms$. And when evaluated against a system without the cache---at $4000ms$ per interaction---this represents a cost savings of $60\%$.
+% High cache hit rates suggest that students tend to follow similar paths through their derivations. In table \ref{tab:table2} we show the number of unique assignment derivations compared against the overall cache hit rate for each assignment. [Fixme: acutally do this.]
 
-High cache hit rates suggest that students tend to follow similar paths through their derivations. In table \ref{tab:table2} we show the number of unique assignment derivations compared against the overall cache hit rate for each assignment. [Fixme: acutally do this.]
+% \subsection{System Performance}
+% 
+% In the final experiment, we measure the relation between system latency and load. Since a MOOC will typically enroll thousands of students, it is important that DeduceIt maintain responsiveness when visited concurrently by many users. Our analytics show DeduceIt receives one incoming request per minute on average. However, at peak load---usually associated with an assignment deadline---the application may receive up to $X$ incoming requests per minute. Since DeduceIt runs on a cloud provider, we can add necessary resources on demand to handle this additional traffic. Over the length of the course, DeduceIt's average latency was $900ms$, which corresponds to the second level of Neilsen's hierarchy of responsiveness \cite{neilsen}.
 
-\subsection{New Possibilities for Analysis}
+\section{Limitations and Future Work}
 
-Out of the 11 DeduceIt assignments, we look more closely at \textit{Regular Expressions I}, \textit{Leftmost Derivation}, and \textit{LL(1) Parsing} to show the new kinds of analyses which DeduceIt enables: \textit{Regular Expressions I} asks students to prove equivalence between two regular expression, \textit{Leftmost Derivation} asks students to perform a leftmost derivation using a provided grammar, and \textit{LL(1) Parsing} asks students to derive a string using a the provided LL(1) parsing table. We chose these assignments as representative examples which become progressively more difficult.
+In our Compilers course we encountered several important limitations of the DeduceIt system: 
 
-[Fixme: We never discussed this, but it seems like a good idea. What are some cool ideas/applications for assignment data?]
+First, a DeduceIt assignment must adopt the syntax of the default rewrite language. This works well for many kinds of assignments (e.g. algebra, basic calculus, predicate logic, regular expressions, and type checking), since instructors can still define custom functions and constants. However, in some assignments, natural notation differs more considerably from DeduceIt's rewrite language (and its possible extensions); this creates unnecessary friction on the derivation interface. For example, \textit{LL(1) Parsing} uses a series of rules to define a lookup table: one student commented that some such rules were defined in ``less than ideal notation.'' %Another told us, ``[the system] is difficult to use since you have to learn the syntax of each problem before actually applying what you know.'' 
 
-\section{Conclusions}
+This is an issue we hope to fix in future versions of DeduceIt. Expressions and rules in the rewrite language do not need to be rendered as text on the student view; customizable HTML trees would allow instructors far more latitude in defining the appearance of assignment notation.
 
-Fixme: real conclusion
+Second, while DeduceIt responds to students with information about semantic errors, syntax errors, correct steps, and annotated hints, some students felt the system wasn't offering them sufficient guidance. One student mentioned, ``I spent more than half an hour trying to understand why deduceit was not accepting my derivations.'' Another agreed: 
+
+\begin{quote}Between the void feedback on wrong submissions and the textbox that doesn't fit half of the answer, it sure wasn't easy to verify who of DeduceIt or the student was the real culprit :-)\end{quote}
+
+Our ongoing work in hint generation addresses this concern. In the current system, not every incorrect step on the proof tree can be annotated by an instructor; an improved system might generate such hints automatically.
+
+Third, student interactions are constrained by proof search. Although instructors can mark rules as free, and this allows students to elide those rules in their derivations, the system is currently limited to two rounds of search, i.e. a limit of two free rule applications per derivation step. Some complex assignments may require a more powerful search strategy: for example, the system may require nearly 100 derivation steps to prove a function is continuous.
+
+We might address this issue in several ways. First, the backend prover can be made more efficient. Alternatively, we could apply crowdsourcing directly to proof verification and search, passing a larger share of computation onto the students themselves.
+
+Fourth, although DeduceIt's proof cache provides a dramatic performance benefit, there are several ways the design of the cache can be improved. For instance, changing the cache representation from a tree into a directed acyclic graph (DAG) would be faster and more space efficient. Likewise, collapsing semantically equivalent derivation steps would also make lookups faster and improve the cache hit rate.
+
+Finally, this paper does not directly address DeduceIt's effect on teaching outcomes: that is, how the system compares with traditional educational tools, and how it impacts student learning. We hope to study such questions in future work.
+
+%reading long formulas in the short text fields is comparable to running up a pretty steep hill
+
+%The Instructions said that the expected number of steps is 4 but I successfully did it in 5
+
+%DeduceIt is difficult to use since you have to learn the syntax of each problem before actually applying what you know
+
+%I struggled for a while on the 1st two (Regular Expressions & Lexical Analysis) since I was trying to learn DeduceIt & trying to apply my new knowledge of these topics
+
+%[Does DeduceIt track] which rule is a dead end and which is not?
+
+%[Issue with bracketing] I spent more than half an hour trying to understand why deduceit was not accepting my derivations.
+
+% Between the void feedback on wrong submissions and the textbox that doesn't fit half of the answer, it sure wasn't easy to verify who of DeduceIt or the student was the real culprit :-)
+
+% I really enjoy the deduceit "puzzles", but the user interface is painful.
+
+%  Rule 8 is not a real typo, but a less than ideal notation
+
+% Sorry, how can I remember exactly after so much time and the strange DeduceIt syntax.
+
+% this class has proven that it's as effective at teaching algorithms as it is at teaching proofs
+
+\section{Conclusion}
+
+Automated systems can help MOOC instructors and students by providing an online class with guidance through interactive assignments. In this paper we present DeduceIt, a system designed to help students with derivations.
+
+DeduceIt enables instructors to set up reusable assignments for any kind of formal derivation, which can be completed by students at specifiable levels of abstraction.
+
+Likewise, DeduceIt provides students with a constrained interface (i.e. a set of transformations that may be applied only to the set of proven or given expressions) which nonetheless allows students to explore a problem domain. In real-time DeduceIt responds with information about the correctness of each derivation step, whether a mistake is due to a syntactic or semantic error, and any hint annotations.
+
+We show that students are successfully engaging with DeduceIt. Out of the X students who used DeduceIt in our online Compilers class, we observe an overall assignment completion rate of 98\% and an average time to completion of Y minutes over 10 assignments. Further, we find using a proof cache can increase the performance of the DeduceIt theorem prover by 72\%, enabling a much more responsive system. 
+
+This paper also outlines how instructors can use DeduceIt to discover future course improvements. By analyzing assignment data (using structures like DeduceIt's proof tree), instructors can determine which parts of an assignment are most difficult for students to complete, or which course concepts are least well understood. Systems like DeduceIt create a stronger feedback loop between a class and its instructor.
+
+% In this paper we present DeduceIt, a system which allows instructors to create and automatically evaluate assignments based on derivations. DeduceIt is based on an underlying rewrite rule system which allows instructors to define assignments over arbitrary formal domains, and it provides students with feedback which is both real-time and constructive. The system indicates when a derivation step is right or wrong, allows students to elide steps (when deemed appropriate by an instructor), and lightly constrains student input. DeduceIt also introduces the idea of a proof cache, a data structure which saves the intermediate steps of student derivations to reuse in later computations.
+% 
+% We deployed DeduceIt in the context of Coursera's Compilers class, where we collected assignment data from hundreds of students. These data show that DeduceIt is being used successfully by many students, and how similar systems can be used to ``debug'' classes, offering instructors insights on how they might improve course material. 
 
 \balance
 
