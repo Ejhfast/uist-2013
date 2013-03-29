@@ -5,46 +5,48 @@ The style file: acm-sigchi.bst
 Database file #1: actual.bib
 Warning--entry type for "suppes-prover" isn't style-file defined
 --line 54 of file actual.bib
-Warning--I didn't find a database entry for "fixme"
-You've used 24 entries,
+Warning--entry type for "coursera-doc" isn't style-file defined
+--line 213 of file actual.bib
+Warning--to sort, need author or key in coursera-doc
+You've used 26 entries,
             2243 wiz_defined-function locations,
-            681 strings with 8129 characters,
-and the built_in function-call counts, 7432 in all, are:
-= -- 698
-> -- 358
+            688 strings with 8412 characters,
+and the built_in function-call counts, 8043 in all, are:
+= -- 755
+> -- 376
 < -- 0
-+ -- 152
-- -- 124
-* -- 473
-:= -- 1191
-add.period$ -- 60
-call.type$ -- 24
-change.case$ -- 132
++ -- 160
+- -- 130
+* -- 506
+:= -- 1269
+add.period$ -- 64
+call.type$ -- 26
+change.case$ -- 141
 chr.to.int$ -- 0
-cite$ -- 24
-duplicate$ -- 266
-empty$ -- 638
-format.name$ -- 124
-if$ -- 1583
+cite$ -- 27
+duplicate$ -- 297
+empty$ -- 703
+format.name$ -- 130
+if$ -- 1729
 int.to.chr$ -- 0
-int.to.str$ -- 24
-missing$ -- 14
-newline$ -- 111
-num.names$ -- 48
-pop$ -- 196
+int.to.str$ -- 26
+missing$ -- 15
+newline$ -- 119
+num.names$ -- 50
+pop$ -- 214
 preamble$ -- 1
-purify$ -- 110
+purify$ -- 117
 quote$ -- 0
-skip$ -- 227
+skip$ -- 256
 stack$ -- 0
-substring$ -- 376
-swap$ -- 62
+substring$ -- 414
+swap$ -- 72
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 92
-warning$ -- 0
-while$ -- 71
-width$ -- 26
-write$ -- 227
-(There were 2 warnings)
+type$ -- 100
+warning$ -- 1
+while$ -- 75
+width$ -- 28
+write$ -- 242
+(There were 3 warnings)

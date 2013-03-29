@@ -1,5 +1,8 @@
 \begin{thebibliography}{10}
 
+\bibitem{coursera-doc}
+Coursera support documentation.
+
 \bibitem{automated-scoring-design}
 Bennett, R.~E., and Bejar, I.~I.
 \newblock Validity and automated scoring: It's not only the scoring, 1998.
@@ -33,6 +36,12 @@ Gallien, T., and Oomen-Early, J.
 \bibitem{automated-grading}
 Hearst, M.
 \newblock The debate on automated essay grading, Sept.-Oct.
+
+\bibitem{auto-grade}
+Hernan-Losada, I., Pareja-Flores, C., and Velazquez-Iturbide, A.
+\newblock Testing-based automatic grading: A proposal from bloom's taxonomy.
+\newblock In {\em Advanced Learning Technologies, 2008. ICALT '08. Eighth IEEE
+  International Conference on} (2008), 847--849.
 
 \bibitem{peer-consistency}
 Huang, S.-W., and Fu, W.-T.
