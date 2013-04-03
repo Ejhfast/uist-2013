@@ -3,50 +3,49 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
 The style file: acm-sigchi.bst
 Database file #1: actual.bib
-Warning--entry type for "suppes-prover" isn't style-file defined
---line 54 of file actual.bib
-Warning--entry type for "coursera-doc" isn't style-file defined
---line 213 of file actual.bib
 Warning--to sort, need author or key in coursera-doc
-You've used 26 entries,
+Warning--empty author in coursera-doc
+Warning--empty journal in coursera-doc
+Warning--empty journal in enroll
+You've used 25 entries,
             2243 wiz_defined-function locations,
-            688 strings with 8412 characters,
-and the built_in function-call counts, 8043 in all, are:
-= -- 755
-> -- 376
+            666 strings with 7724 characters,
+and the built_in function-call counts, 7378 in all, are:
+= -- 730
+> -- 359
 < -- 0
-+ -- 160
-- -- 130
-* -- 506
-:= -- 1269
-add.period$ -- 64
-call.type$ -- 26
-change.case$ -- 141
++ -- 153
+- -- 124
+* -- 566
+:= -- 1270
+add.period$ -- 74
+call.type$ -- 25
+change.case$ -- 135
 chr.to.int$ -- 0
-cite$ -- 27
-duplicate$ -- 297
-empty$ -- 703
-format.name$ -- 130
-if$ -- 1729
+cite$ -- 29
+duplicate$ -- 206
+empty$ -- 565
+format.name$ -- 124
+if$ -- 1491
 int.to.chr$ -- 0
-int.to.str$ -- 26
-missing$ -- 15
-newline$ -- 119
-num.names$ -- 50
-pop$ -- 214
+int.to.str$ -- 25
+missing$ -- 27
+newline$ -- 127
+num.names$ -- 48
+pop$ -- 109
 preamble$ -- 1
-purify$ -- 117
+purify$ -- 112
 quote$ -- 0
-skip$ -- 256
+skip$ -- 132
 stack$ -- 0
-substring$ -- 414
-swap$ -- 72
+substring$ -- 479
+swap$ -- 23
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 100
-warning$ -- 1
-while$ -- 75
-width$ -- 28
-write$ -- 242
-(There were 3 warnings)
+type$ -- 96
+warning$ -- 4
+while$ -- 74
+width$ -- 27
+write$ -- 243
+(There were 4 warnings)

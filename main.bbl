@@ -2,53 +2,60 @@
 
 \bibitem{coursera-doc}
 Coursera support documentation.
+\newblock \url{http://support.coursera.org}.
 
 \bibitem{automated-scoring-design}
 Bennett, R.~E., and Bejar, I.~I.
-\newblock Validity and automated scoring: It's not only the scoring, 1998.
+\newblock Validity and automated scoring: It's not only the scoring.
+\newblock {\em Educational Measurement: Issues and Practice 17}, 4 (1998),
+  9--17.
 
 \bibitem{derivation-scoring}
 Bennett, R.~E., Steffen, M., Singley, M.~K., Morley, M., and Jacquemin, D.
 \newblock Evaluating an automatically scorable, open-ended response type for
-  measuring mathematical reasoning in computer-adaptive tests, 1997.
+  measuring mathematical reasoning in computer-adaptive tests.
+\newblock {\em Journal of Educational Measurement 34}, 2 (1997), pp. 162--176.
 
 \bibitem{dynamic-rules}
 Bravenboer, M., van Dam, A., Olmos, K., and Visser, E.
-\newblock Program transformation with scoped dynamic rewrite rules, July 2005.
+\newblock Program transformation with scoped dynamic rewrite rules.
+\newblock {\em Fundam. Inf. 69}, 1-2 (2005), 123--178.
 
 \bibitem{grade-programs}
 Cheang, B., Kurnia, A., Lim, A., and Oon, W.-C.
 \newblock On automated grading of programming assignments in an academic
   institution.
-\newblock {\em Comput. Educ. 41}, 2 (Sept. 2003), 121--131.
+\newblock {\em Comput. Educ. 41}, 2 (2003), 121--131.
 
 \bibitem{maude}
-Clavel, M., Durán, F., Eker, S., Lincoln, P., Martí-Oliet, N., Meseguer, J.,
-  and Quesada, J.~F.
-\newblock Maude as a metalanguage, 1998.
+Clavel, M., Dur{\'a}n, F., Eker, S., Lincoln, P., Mart{\'\i}-Oliet, N.,
+  Meseguer, J., and Quesada, J.
+\newblock Maude as a metalanguage.
+\newblock {\em In Proc. WRLA 1998 15\/} (1998).
 
 \bibitem{personalized-feedback}
 Gallien, T., and Oomen-Early, J.
 \newblock Personalized versus collective instructor feedback in the online
   courseroom: Does type of feedback affect student satisfaction, academic
-  performance and perceived connectedness with the instructor?, July 2008.
+  performance and perceived connectedness with the instructor?
+\newblock {\em International Journal on E-Learning 7}, 3 (2008), 463--476.
 
 \bibitem{automated-grading}
 Hearst, M.
-\newblock The debate on automated essay grading, Sept.-Oct.
+\newblock The debate on automated essay grading.
+\newblock {\em Intelligent Systems and their Applications, IEEE 15}, 5 (2000),
+  22--37.
 
 \bibitem{auto-grade}
 Hernan-Losada, I., Pareja-Flores, C., and Velazquez-Iturbide, A.
 \newblock Testing-based automatic grading: A proposal from bloom's taxonomy.
-\newblock In {\em Advanced Learning Technologies, 2008. ICALT '08. Eighth IEEE
-  International Conference on} (2008), 847--849.
+\newblock {\em In Proc. ICALT 2008\/} (2008), 847--849.
 
 \bibitem{peer-consistency}
 Huang, S.-W., and Fu, W.-T.
 \newblock Enhancing reliability using peer consistency evaluation in human
   computation.
-\newblock In {\em Proceedings of the 2013 conference on Computer supported
-  cooperative work}, CSCW '13, ACM (New York, NY, USA, 2013), 639--648.
+\newblock {\em In Proc. CSCW 2013\/} (2013), 639--648.
 
 \bibitem{bisearch}
 Kaindl, H., and Kainz, G.
@@ -60,7 +67,7 @@ Kaindl, H., and Kainz, G.
 Kaufmann, M., and Moore, J.~S.
 \newblock An industrial strength theorem prover for a logic based on common
   lisp.
-\newblock {\em IEEE Trans. Softw. Eng. 23}, 4 (Apr. 1997), 203--213.
+\newblock {\em IEEE Trans. Softw. Eng. 23}, 4 (1997), 203--213.
 
 \bibitem{citeulike}
 Kirsh, D., and Maglio, P.~P.
@@ -71,20 +78,18 @@ Kirsh, D., and Maglio, P.~P.
 Kulkarni, C., Pang, K., Le, H., Chia, D., Papadopoulos, K., Cheng, J., Koller,
   D., and Klemmer, S.
 \newblock Peer and self assessment in massive online design classes.
-\newblock {\em ACM Transactions on Computer-Human Interaction (in
-  submission)\/} (2013).
+\newblock {\em ACM TOCHI (in submission)\/} (2013).
 
 \bibitem{crowd-snippets}
 Lieber, T., and Miller, R.
 \newblock Programming with everybody: tightening the copy-modify-publish
   feedback loop.
-\newblock In {\em Adjunct proceedings of the 25th annual ACM symposium on User
-  interface software and technology}, UIST Adjunct Proceedings '12, ACM (New
-  York, NY, USA, 2012), 101--102.
+\newblock {\em In UIST Adjunct Proceedings 2012\/} (2012), 101--102.
 
 \bibitem{rewriting-logic}
 Martí-Oliet, N., and Meseguer, J.
-\newblock Rewriting logic: Roadmap and bibliography, 2001.
+\newblock Rewriting logic: Roadmap and bibliography.
+\newblock {\em J. Log. Algebr. Program. 81\/} (2001).
 
 \bibitem{neilsen}
 Nielsen, J.
@@ -96,44 +101,41 @@ Nipkow, T., Wenzel, M., and Paulson, L.~C.
 \newblock {\em Isabelle/HOL: a proof assistant for higher-order logic}.
 \newblock Springer-Verlag, Berlin, Heidelberg, 2002.
 
-\bibitem{interface-learning-load}
-Oviatt, S., Arthur, A., and Cohen, J.
-\newblock Quiet interfaces that help students think.
-\newblock In {\em Proceedings of the 19th annual ACM symposium on User
-  interface software and technology}, UIST '06, ACM (New York, NY, USA, 2006),
-  191--200.
-
 \bibitem{enroll}
 Pappano, L.
 \newblock Massive open online courses are multiplying at a rapid pace.
+\newblock
+  \url{http://www.nytimes.com/2012/11/04/education/edlife/massive-open-online-courses-are-multiplying-at-a-rapid-pace.html}.
 
 \bibitem{coq}
 Paulin-Mohring, C.
-\newblock Inductive definitions in the system coq rules and properties, 1992.
+\newblock Inductive definitions in the system coq rules and properties.
+\newblock {\em TLCA 1993\/} (1993).
 
 \bibitem{isabelle}
 Paulson, L.~C.
-\newblock The foundation of a generic theorem prover, 1989.
+\newblock The foundation of a generic theorem prover.
+\newblock {\em Journal of Automated Reasoning 5\/} (1989).
 
 \bibitem{moss}
 Schleimer, S., Wilkerson, D.~S., and Aiken, A.
 \newblock Winnowing: local algorithms for document fingerprinting.
-\newblock In {\em Proceedings of the 2003 ACM SIGMOD international conference
-  on Management of data}, SIGMOD '03, ACM (New York, NY, USA, 2003), 76--85.
+\newblock {\em In Proc. ACM SIGMOD 2003\/} (2003), 76--85.
 
 \bibitem{suppes}
 Suppes, P.
-\newblock The next generation of interactive theorem provers, 1984.
+\newblock The next generation of interactive theorem provers.
+\newblock {\em 7th International Conference on Automated Deduction 170\/}
+  (1984), 303--315.
 
 \bibitem{suppes-prover}
 Suppes, P.
-\newblock Student use of an interactive theorem prover, 1984.
+\newblock Student use of an interactive theorem prover.
+\newblock {\em Contemporary Mathematics 29\/} (1984).
 
 \bibitem{peer-assessment}
 Tosic, M., and Nejkovic, V.
 \newblock Trust-based peer assessment for virtual learning systems.
-\newblock In {\em Proceedings of the Second international conference on Social
-  informatics}, SocInfo'10, Springer-Verlag (Berlin, Heidelberg, 2010),
-  176--191.
+\newblock {\em In Proc. SocInfo 2010\/} (2010), 176--191.
 
 \end{thebibliography}
