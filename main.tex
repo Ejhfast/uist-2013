@@ -220,7 +220,7 @@ While DeduceIt's derivation checker operates primarily as a term rewriting syste
 
 Instructors can use DeduceIt to define nearly any kind of formal assignment. To create an assignment, an instructor must specify four things: 
   \begin{enumerate}
-  \item Rewrite language: DeduceIt provides every assignment with a default rewrite language composed of variables, symbols, integers, and several common unary and binary operators. In many assignment domains this will be sufficient, but an instructor may optionally augment the language with extra syntax for functions and constants (Figure~\ref{fig:rewrite_language}). 
+  \item Rewrite language: Every assignment has a default rewrite language composed of variables, symbols, integers, and several common unary and binary operators. In many assignment domains this will be sufficient, but an instructor may optionally augment the language with extra syntax for functions and constants (Figure~\ref{fig:rewrite_language}). 
   \item Rulesets: Named sets of rewrite rules which a student may apply while working through an assignment's derivation. One ruleset corresponds to many underlying rewrite rules. This is necessary because an instructor may want to refer to several distinct rules by the same name (e.g., $1*X \rightarrow X$ and $X*1 \rightarrow X$ are two distinct rewrite rules describing the multiplicative identity.)
   \item The given expression(s): A set of expressions which serve as the starting point of a derivation.
   \item The goal expression: The desired result of a derivation.
@@ -273,7 +273,7 @@ Each assignment page contains an interactive derivation. Before a student has ma
 
 \subsubsection{Constraints on a Derivation}
 
-This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or which are members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constraints eliminate the possibility of many simple mistakes, like typos, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
+This derivation interface constrains students in several respects. First, students may select only expressions which they have already derived (or members of the set of starting givens) from the givens input field. Likewise, students may only select rules which are associated with the current assignment from the rules input field. These constraints eliminate the possibility of many simple mistakes, like typos, which we found surprisingly common in an earlier prototype of the system. The conclusion input field is unconstrained, however, and students can type into it any kind of expression they wish.
 
 \subsubsection{Types of Derivation Feedback}
 
@@ -293,7 +293,7 @@ From anecdotal feedback, it seems students find this indicator helpful, and Dedu
 
 DeduceIt allows instructors to set up hints for any derivation step by annotating an assignment's proof tree. However, we built another version of DeduceIt that constructs these hints automatically using proof search. In this second implementation, DeduceIt holds the rule and assumption fields constant and searches for alternative valid conclusions. 
 
-For instance, suppose a student enters $x=3+1$, \textit{Balance Equation}, and $x+1=3$ in the respective fields for conclusion, rule, and assumptions. This is an incorrect step, so DeduceIt will highlight it in red. And in the standard version of DeduceIt, if an instructor has not annotated this step on the proof tree, this is all the system will do. The student will not be given any further direction; she knows only the step is wrong. However, the hint-generating DeduceIt is able to give her more specific feedback, e.g., ``Check the sign of your transformation." Here proof search finds a viable alternative conclusion, $x=3-1$, which matches the rule and assumption the student entered, so DeduceIt knows it is possible to apply the selected rule upon the selected assumptions.
+For instance, suppose that students enter $x=3+1$, \textit{Balance Equation}, and $x+1=3$ in the fields for conclusion, rule, and assumptions. This is an incorrect step, so DeduceIt will highlight it in red. And in the standard version of DeduceIt, if an instructor has not annotated this step on the proof tree, this is all the system will do. Students will only know the step is wrong. However, the hint-generating DeduceIt is able to give students more specific feedback, e.g., ``Balance Equation can be applied, but your conclusion is incorrect." Here proof search finds a viable alternative conclusion, $x=3-1$, so DeduceIt knows it is possible to apply the selected rule upon the selected given.
 
 Other hint-generating systems might hold constant different parts of the derivation (e.g., searching for rules and assumptions to match a given conclusion). It is important that the system provide useful hints without giving away too much information: a tricky balance to achieve in an automated system. Hint generation is the subject of ongoing work.
 
@@ -306,7 +306,7 @@ We built these components using several technologies and cloud providers. The fr
 
 \subsection{The Theorem Prover}
 
-To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e., named groups of rewrite rules), context independent rules, dynamic evaluation for some term expressions, and containment conditions on the application of certain rewrites, as discussed earlier.
+To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e., named groups of rewrite rules), context independent rules, dynamic evaluation for some term expressions, and conditions on the application of certain rewrites, as discussed earlier.
 
 DeduceIt's theorem prover also includes a parser which the system constructs dynamically on each theorem prover call. This allows instructors to define custom assignment syntax. DeduceIt uses the parser to deconstruct the arguments of a theorem prover call into expression terms of the rewrite language before it passes these terms to the prover.
 
@@ -320,7 +320,7 @@ Although in the previous section we mentioned a student can select only one rule
 
 \subsubsection{Proof Search}
 
-In DeduceIt, proof search works by applying rewrite rules iteratively upon a group of expressions to generate new expressions. In general, a search may be considered either \textit{forward}, starting from the known expressions and working toward the desired expressions, or \textit{backward}, starting from the desired expressions and working toward the known expressions with an inverted set of rules. DeduceIt supports both kinds of search. 
+Proof search applies rewrite rules iteratively upon a group of expressions to generate new expressions. In general, a search may be considered either \textit{forward}, starting from the known expressions and working toward the desired expressions, or \textit{backward}, starting from the desired expressions and working toward the known expressions with an inverted set of rules. DeduceIt supports both kinds of search. 
 
 For example, suppose we give DeduceIt the assumption $a$, the rewrite rule $a \rightarrow a.a$, and the conclusion $a.a.a$. The system may conduct a forward search: start from $a$ and apply the rule twice, first producing $a.a$ and then $a.a.a$. Or it may search backward: construct a new rule $a.a \rightarrow a$ (the inverse of the old rule) and start from $a.a.a$, and then apply this new rule twice to produce $a.a$ and then $a$. Either method leads the system to declare the step valid.
 
@@ -400,17 +400,21 @@ First, we analyze the amount of time students spent on each assignment. Our resu
 
 \subsection{Rule Time Distributions}
 
-We also observe the time distribution which governs rule application across assignments. Supposing some rules are easier or more natural to apply than others, we can use DeduceIt to find rules associated with longer elapsed time between steps, revealing what parts of the course material are more likely to confuse students. On average, it takes students 163 seconds to apply a rule in a derivation; around 3 minutes elapses between one derivation step and the next. We find ``Nonterm Y input plus'' is the rule with the shortest elapsed time between steps (2s), and ``Nonterm Y input end'' is the rule associated with the longest elapsed time (1482s). 
+We also observe the time distribution which governs rule application across assignments. Supposing some rules are easier or more natural to apply than others, we can use DeduceIt to find rules associated with longer elapsed time between steps, revealing what parts of the course material are more likely to confuse students. On average, it takes students 163 seconds to apply a rule in a derivation; around 3 minutes elapses between one derivation step and the next. 
 
-Curiously, both rules come from the same assignment \textit{LL(1) Parsing} and dictate valid operations over a lookup table. However, while ``Nonterm Y input plus'' appears on a correct derivation path, ``Nonterm Y input end'' does not. Most students using the latter rule entered a valid but misleading conclusion on the previous derivation step; such a step is an ideal candidate for hint annotation on the assignment proof tree (e.g., a hint which suggests, ``while this step is correct, it doesn't lead to the solution.''). %Fixme: double check this stuff
+We find that ``Nonterm Y input end'' is the rule associated with the longest elapsed time (1482s). This rule comes from \textit{LL(1) Parsing} and represents an operation on a lookup table. Most students using ``Nonterm Y input end'' have entered a valid but misleading conclusion on the previous derivation step, which is an ideal candidate for hint annotation on the assignment proof tree (e.g., a hint which suggests, ``While this step is correct, it doesn't lead to the solution.''). %Fixme: double check this stuff
 
-For a second use-case of this data, we examine the assignment \textit{Regular Expressions I}. Here, the rules ``Left Identity'' and ``Right Identity'' are used by students most quickly, at about 100 seconds between applications. The ``Unfold'' rule is the most slowly used, at approximately 400 seconds in its application. This suggests Unfold may be the most challenging property of regular expressions for students to understand. In general, instructors might use such information to better focus the emphasis of their lectures.
+For a second use-case of this data, we examine the assignment \textit{Regular Expressions I}. Here, the rules ``Left Identity'' and ``Right Identity'' are used by students most quickly, at about 100 seconds between applications. The ``Unfold'' rule is the most slowly used, at approximately 400 seconds in its application. This suggests Unfold may be the most challenging property of regular expressions for students to understand. 
 
-More generally, these analytics grant the instructors fine-grained insight into students' understanding, even on complex assignments.
+More generally, these analytics grant the instructors fine-grained insight into students' understanding, even on complex assignments. Instructors might use such information to better focus the emphasis of their lectures.
 
 \subsection{Student Success Rates}
 
 Next, we examine the success rates of students across assignments. These results are displayed in table \ref{tab:table1}. Success rates are uniformly high, ranging from $93\%$ to $99\%$, and these rates track reported assignment difficulty in a manner consistent with time distributions. %\msb{Might be out of scope, but you could run a linear correlation on success rates vs. time spent, or even better, a multiple regression using success rate and time spent to predict self-rated difficulty. That could be quite useful.}
+
+High success rates do not necessarily suggest that students learned from these assignments, but we received feedback which supports this idea. Many students found DeduceIt's derivation constraints (e.g., a list of available rules and givens, and step-by-step validation) useful for understanding the domain of a problem. One student mentioned, ``Being able to step through the parsing actions and `be' the parser and know immediately when I made a mistake was incredibly helpful in coming to truly understand how the different parsing styles work.'' Another agreed, ``DeduceIt seemed frustrating at first, but after playing with it for a while, it turned out to be incredibly helpful in the realization of lecture material concretely. This is something which is difficult for self study.''
+
+However, DeduceIt's derivation constraints do trade some flexibility in assignment notation for ease of verification, and not all students were happy with a system which ``is difficult to use since you have to learn the syntax of each problem before actually applying what you know.'' DeduceIt is a middle ground on the spectrum between flexibility and automation.  
 
 \subsection{Student Error Rates}
 
@@ -454,14 +458,7 @@ Third, student interactions are constrained by proof search. Although instructor
 
 Fourth, although DeduceIt's proof cache provides a dramatic performance benefit, there are several ways the design of the cache can be improved. For instance, changing the cache representation from a tree into a directed acyclic graph (DAG) would be faster and more space efficient. Likewise, collapsing semantically equivalent derivation steps would also make lookups faster and improve the cache hit rate.
 
-Finally, this paper does not directly address DeduceIt's effect on teaching outcomes: how the system compares with traditional educational tools, and how it impacts student learning. However, the student feedback we collected was promising:
-
-\begin{itemize}
-  \item ``I found the DeduceIt exercise \textit{especially} helpful in getting a better handle on the material. Being able to step through the parsing actions and `be' the parser and know immediately when I made a mistake was incredibly helpful in coming to truly understand how the different parsing styles work. So... thanks a lot for that! I seriously hope you guys continue to make use of DeduceIt as a learning tool in future endeavors.''
-  \item ``The first thing I thought when I started working on any DeduceIt problems was `Man, I wish this was a tool my university used.' I've found that it made a lot of sense to use it to walk through the process of parsing things and have immediate feedback when you were looking at it wrong.''
-\end{itemize}
-
-We hope to study learning outcomes in future work.
+Finally, this paper does not directly address DeduceIt's effect on teaching outcomes: that is, how the system compares with traditional educational tools, and how it impacts student learning. We hope to study this question in future work.
 
 %reading long formulas in the short text fields is comparable to running up a pretty steep hill
 
@@ -487,7 +484,7 @@ We hope to study learning outcomes in future work.
 
 \section{Conclusion}
 
-For online education to succeed, it must move beyond simple multiple-choice problems to the kinds of open-ended assignments that real courses use. Peer grading holds promise but requires a large amount of effort \cite{peer-consistency}. However, for the many online courses that might use formal, structured reasoning, automated systems can step in and provide guidance through interactive assignments. We thus presented DeduceIt, a system exploring this potential for student derivations in arbitrary formal domains. 
+For online education to succeed, it must move beyond simple multiple-choice problems to the kinds of open-ended assignments used by real courses. Peer grading holds promise but requires a large amount of effort \cite{peer-consistency}. However, for the many online courses that might use formal, structured reasoning, automated systems can provide guidance through interactive assignments. We presented DeduceIt, a system exploring this potential for student derivations in arbitrary formal domains. 
 
 DeduceIt enables instructors to set up reusable assignments for any kind of formal derivation, which can be completed by students at specifiable levels of abstraction. DeduceIt provides students with constraints --- transformations that may be applied only to the set of proven or given expressions --- which provide useful rails as the students work. DeduceIt responds in real-time with information about the correctness of each derivation step, whether a mistake is due to a syntactic or semantic error, as well as hint annotations.
 
