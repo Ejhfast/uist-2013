@@ -17,7 +17,7 @@
 %\renewcommand{\ttdefault}{cmtt}
 %\usepackage{fontspec}
 %\setmainfont{Cardo}
-\usepackage{url}      % llt: nicely formatted URLs
+\usepackage[hyphens]{url}      % llt: nicely formatted URLs
 \usepackage{dblfloatfix}
 \usepackage{caption}
 
@@ -310,13 +310,13 @@ For instance, suppose that students enter $x=3+1$, \textit{Balance Equation}, an
 Other hint-generating systems might hold constant different parts of the derivation (e.g., searching for rules and assumptions to match a given conclusion).
 
 \section{Implementation and Proof Cache}
+The core implementation challenge of DeduceIt is to run a large-scale theorem prover in real time. DeduceIt is a system formed of three distinct components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors) as described in the previous section, the backend theorem prover exposes an online API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the various proof trees which together constitute the proof cache. %\msb{So it's technically not a cache, e.g., stored in memcached? I bet it could be much faster.}
 
+% msg removing this sentence, it has no real content in it and isn't really serving as a topic sentence either
+%We built these components using several technologies and cloud providers.
+The frontend is a Ruby on Rails web application deployed on Heroku, the backend is a Haskell application also deployed on Heroku, and the database is a MongoDB installation running on MongoHQ. Each of these components can be scaled to serve arbitrary numbers of students.
 
-DeduceIt is a system formed of three distinct components: a frontend interface, a backend theorem prover, and a database. The frontend manages all user interactions (for both students and instructors) as described in the previous section, the backend theorem prover exposes an online API which the frontend calls---when necessary---to check student derivations, and the database stores all the data associated with users and assignments, including the various proof trees which together constitute the proof cache. %\msb{So it's technically not a cache, e.g., stored in memcached? I bet it could be much faster.}
-
-We built these components using several technologies and cloud providers. The frontend is a Ruby on Rails web application deployed on Heroku, the backend is a Haskell application also deployed on Heroku, and the database is a MongoDB installation running on MongoHQ. Each of these components can be scaled to serve arbitrary numbers of students.
-
-\subsection{The Theorem Prover}
+\subsection{Theorem Prover}
 
 To verify student derivations, DeduceIt applies proof search over a term rewriting system. Its system differs from a standard rewriting system in that it supports rulesets (i.e., named groups of rewrite rules), context independent rules, dynamic evaluation for some term expressions, and conditions on the application of certain rewrites, as discussed earlier.
 
@@ -340,9 +340,9 @@ In practice, DeduceIt conducts one round of forward search and one round of back
 
 We find the system is limited to two rounds of search under reasonable time constraints, with an upper bound of 4 seconds for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. Notably, this delay falls into the third classification of Nielsen's work on response times, beneath the ten-second limit for keeping a user focused on his or her dialog with the system \cite{neilsen}. While the theorem prover could be made more efficient, the next section will demonstrate that in many cases this is unneccessary.
 
-\subsection{The Proof Cache}
+\subsection{Proof Cache}
 
-The proof cache is a data structure DeduceIt uses to track all responses the frontend application receives from the prover. This cache is composed of many proof trees, one for each assignment, and together these proof trees track the aggregate history of every attempted derivation (as we discussed in Section 3). Proof trees are a useful tool for managing assignments---through them an instructor can annotate derivation steps and override the default behavior of the prover---but they can also, by acting as a cache, dramatically improve the overall performance of the system. 
+The proof cache is a data structure DeduceIt uses to track all responses the frontend application receives from the prover. This cache is composed of many proof trees, one for each assignment, and together these proof trees track the aggregate history of every attempted derivation. Proof trees are a useful tool for managing assignments---through them an instructor can annotate derivation steps and override the default behavior of the prover---but they can also, by acting as a cache, dramatically improve the overall performance of the system. 
 
 DeduceIt's bottleneck is in its prover; proof search is by far the most computationally expensive aspect of the system. A proof cache can limit the outbound queries to the prover and so, intuitively, increase the performance of the system. 
 
@@ -362,13 +362,14 @@ To evaluate DeduceIt we deployed it in the winter 2013 offering of Coursera's \t
 In this section we provide evidence for two claims:
 
 \begin{enumerate}
-  \item \textit{Students successfully use DeduceIt for derivations}. We show through data analysis and anecdotal feedback that students engage with DeduceIt to solve problems.
-  \item \textit{DeduceIt can provide instructors with insights that translate into future course improvements}. Here we provide examples from our experience with the Compilers course. 
+  \item \textit{Students successfully use DeduceIt for derivations}. We show through data analysis and user feedback that students engage with DeduceIt to solve problems.
+  \item \textit{DeduceIt provides instructors with insights that translate into future course improvements}. Here we provide examples from our experience with the Compilers course. 
 \end{enumerate}
   
 We run several analyses over ten DeduceIt assignments, measuring the distribution of students' time spent on assignments and derivation steps, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache.
 
-\begin{figure}[!h]
+\subsection{Assignment Time Distributions}
+\begin{figure}[tb]
 \centering
 \includegraphics[width=1\columnwidth]{hist_short}
 \caption{Normalized histograms show student time distributions for each assignment. The x-axis measures time in minutes. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty.}
@@ -406,15 +407,13 @@ We run several analyses over ten DeduceIt assignments, measuring the distributio
   \label{tab:table1}
 \end{table*}
 
-\subsection{Assignment Time Distributions}
-
-First, we analyze the amount of time students spent on each assignment. Our results are displayed in Figure \ref{fig:distributions}. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty. For example, in the \textit{Rightmost Derivation} assignment students are clustered around $4$ minutes, and in the \textit{Shift-Reduce Parsing} assignment they are clustered around $10$ minutes; the \textit{Rightmost Derivation} assignment is generally considered easier by students than \textit{Shift-Reduce Parsing}. This relation holds true among the remainder of the assignments. In offline assignments, instructors had to guess at difficulty with formal reasoning assignments or ask students, who may have faulty recall. %Fixme: flatten histograms a bit
+First, we analyze the amount of time students spent on each assignment. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty (Figure~\ref{fig:distributions}). For example, in the \textit{Rightmost Derivation} assignment students are clustered around $4$ minutes, and in the \textit{Shift-Reduce Parsing} assignment they are clustered around $10$ minutes; the \textit{Rightmost Derivation} assignment is generally considered easier by students than \textit{Shift-Reduce Parsing}. This relation holds true among the remainder of the assignments. To determine assignment difficulty in traditional courses, instructors would typically need to guess or to ask students, who may have faulty recall.
 
 \subsection{Rule Time Distributions}
 
-We also observe the time distribution which governs rule application across assignments. Supposing some rules are easier or more natural to apply than others, we can use DeduceIt to find rules associated with longer elapsed time between steps, revealing what parts of the course material are more likely to confuse students. On average, it takes students 163 seconds to apply a rule in a derivation; around 3 minutes elapses between one derivation step and the next. 
+We also observe the time distribution which governs rule application across assignments. Supposing some rules are easier or more natural to apply than others, we can use DeduceIt to find rules associated with longer elapsed time between steps, revealing what parts of the course material are more likely to confuse students. On average, it takes students 163 seconds (roughly 3 minutes) between derivation steps. 
 
-We find that ``Nonterm Y input end'' is the rule associated with the longest elapsed time (1482s). This rule comes from \textit{LL(1) Parsing} and represents an operation on a lookup table. Most students using ``Nonterm Y input end'' have entered a valid but misleading conclusion on the previous derivation step, which is an ideal candidate for hint annotation on the assignment proof tree (e.g., a hint which suggests, ``While this step is correct, it doesn't lead to the solution.''). %Fixme: double check this stuff
+Rule time distributions may also help instructors diagnose problematic derivation paths. For example, ``Nonterm Y input end'' is the rule associated with the longest elapsed time (1482s). This rule comes from \textit{LL(1) Parsing} and represents an operation on a lookup table. Most students using ``Nonterm Y input end'' have entered a valid but misleading conclusion on the previous derivation step, which is an ideal candidate for hint annotation on the assignment proof tree (e.g., a hint which suggests, ``While this step is correct, it doesn't lead to the solution.''). %Fixme: double check this stuff
 
 For a second use-case of this data, we examine the assignment \textit{Regular Expressions I}. Here, the rules ``Left Identity'' and ``Right Identity'' are used by students most quickly, at about 100 seconds between applications. The ``Unfold'' rule is the most slowly used, at approximately 400 seconds in its application. This suggests Unfold may be the most challenging property of regular expressions for students to understand. 
 
@@ -436,7 +435,7 @@ To approximate the impact of these two classes of error, we divide student mista
 
 Across all assignments syntax errors are low, never exceeding $11\%$. Notably, the highest rate of syntax errors occurred in the first class assignment, \textit{Regular Expressions I}, despite the fact that students generally considered this assignment the easiest. The syntax error rates of subsequent assignments never exceeded $6\%$, although these later assignments were much more difficult. In fact, in the last 6 assignments, the average syntax error rate was only 1.3\%. This is likely a result of students learning to use the system. Low overall rates among syntax errors suggest that DeduceIt is not confusing students to the detriment of assignment completion and correctness.
 
-\begin{figure}[!h]
+\begin{figure}[tb]
 \centering
 \includegraphics[width=1\columnwidth]{cache}
 \caption{The x-axis measures the total number of derivation steps entered into the system. The y-axis measures the cache hit rate as a percentage.}
@@ -444,11 +443,11 @@ Across all assignments syntax errors are low, never exceeding $11\%$. Notably, t
 \end{figure}
 
 \subsection{Performance Impact of the Cache}
-First, we test a hypothesis which provides the general intuition behind the proof cache: \textit{most derivations contain steps that other students have previously used or will use in the future}. We counted the number of unique derivation steps entered into the class assignments. Of 50,099 total steps, only 5,407 (10\%) of them are unique. Since 90\% of derivation steps are reused, the data supports our first hypothesis.
+We test a hypothesis which provides the general intuition behind the proof cache: \textit{most derivations contain steps that other students have previously used or will use in the future}. Of 50,099 total derivation steps in the class, only 5,407 (10\%) of them are unique. So, 90\% of derivation steps are reused, which indicates that a proof cache may be useful.
 
 Next, we examine our second hypothesis: \textit{it is more efficient to reuse the intermediate results of one student's derivation to check the validity of another student's derivation than to check every derivation step with the prover}. To test this hypothesis, we measured the overall proof cache hit rate. In Figure \ref{fig:proofcache}, we show the cache hit rate plotted against time. By the 1900th student interaction, the cache has reached a hit rate of $90\%$. Since the average theorem prover call takes $810ms$ and the average cache lookup takes $23ms$, we can compute an average time of $810ms*0.10+23ms*0.90=101.7ms$. This represents a cost savings of 87\% and qualitatively improves usability: running the cache allows DeduceIt to move up one level on Nielsen's hierarchy of responsiveness \cite{neilsen}. As DeduceIt adds more attempted derivation steps to the cache, the hit rate should continue to climb, albeit at a slower rate.
 
-Further, the proof cache has benefits over memorization in a single user system. The proof cache hit rate is high because many students tend to enter the same derivation steps. A single student is less likely to enter the same derivation step more than once. Collectively, students reuse 90\% of derivation steps, whereas on average, individual students reuse less than 17\% of steps. 
+Further, the proof cache has benefits over memoization in a single user system. The proof cache hit rate is high because many students tend to enter the same derivation steps. A single student is less likely to enter the same derivation step more than once. Collectively, students reuse 90\% of derivation steps, whereas on average, individual students reuse less than 17\% of steps. 
 
 % High cache hit rates suggest that students tend to follow similar paths through their derivations. In table \ref{tab:table2} we show the number of unique assignment derivations compared against the overall cache hit rate for each assignment. [Fixme: acutally do this.]
 
@@ -504,7 +503,7 @@ DeduceIt enables instructors to set up reusable assignments for any kind of form
 
 Students and instructors are successfully engaging with DeduceIt. Out of the 990 students who used DeduceIt in our online Compilers class, we observe an overall assignment completion rate of 96.5\% and an average time to completion of 12.7 minutes over 10 assignments. Similarities in student proofs allow us to provide feedback to students at speeds that would be impossible using standalone systems. Further, instructors are using DeduceIt to perform course analytics that were quite difficult to track before. By analyzing assignment data using structures like DeduceIt's proof tree, instructors can determine which parts of an assignment are most difficult for students to complete, or which course concepts are least well understood.
 
-DeduceIt points toward a future for online education that allows for assignments with complex reasoning requirements and multiple correct answers. Generalizing the system beyond formal derivations, or asking students to check and approve each others' claims, might create opportunities for more general instances of structured reasoning in domains such as chemistry, physics, or even law and philosophy. DeduceIt and the compilers course are available at \url{http://www.coursera.org/course/compilers}.
+DeduceIt points toward a future for online education that allows for assignments with complex reasoning requirements and multiple correct answers. Generalizing the system beyond formal derivations, or asking students to check and approve each others' claims, might create opportunities for more general instances of structured reasoning in domains such as chemistry, physics, or even law. DeduceIt and the compilers course are available at \url{http://www.coursera.org/course/compilers}.
 
 %\msb{Save space in references by citing papers as ``In Proc. UIST 2007'', ``In Proc. CHI 2012'', ``ACM TOCHI'', etc. See any of my conference papers for examples. Also, check the refs: several of them (e.g., Bennett) have no venue listed. Also, be consistent in citation style.}
 
