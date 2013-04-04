@@ -76,12 +76,12 @@ breaklinks=true,
 
 \title{Interactive formal reasoning for large online courses}
 
-\numberofauthors{1}
-\author{
-  \alignauthor Ethan Fast, Colleen Lee, Alex Aiken, Daphne Koller, Michael Bernstein, Eric Smith\\
-    \affaddr{Stanford University}\\
-    \email{\{ethan.fast, clee0, aiken, koller, msb, eric\}@cs.stanford.edu}\\
-}
+%\numberofauthors{1}
+%\author{
+%  \alignauthor Ethan Fast, Colleen Lee, Alex Aiken, Daphne Koller, Michael Bernstein, Eric Smith\\
+%    \affaddr{Stanford University}\\
+%    \email{\{ethan.fast, clee0, aiken, koller, msb, eric\}@cs.stanford.edu}\\
+%}
 
 \maketitle
 
@@ -127,7 +127,7 @@ This paper addresses the design of a system built to evaluate \textit{derivation
 
 We adopt a broad view of assignment evaluation. While a simple grading system can tell a student whether an answer is correct (e.g., through multiple choice or string matching), it doesn't know enough about a student's reasoning to provide guidance in the event that an answer is wrong. Most existing grading systems offer students limited feedback, typically unassociated with the intermediate steps of a solution \cite{coursera-doc}. However, derivations are prone to a great deal of internal variation, and often have many right answers \cite{derivation-scoring}. We aim to provide \textit{constructive} suggestions \cite{personalized-feedback}.
 
-Similarly, students tend to learn better when subject to \textit{real-time} feedback loops, for example help from human TAs in a traditional course setting \cite{personalized-feedback, derivation-scoring}. Since we are concerned with a system designed to work with derivations, this constraint is particularly important; theorem prover calls are expensive computations \cite{bisearch} and often do not complete at sufficiently interactive speeds.
+Similarly, students tend to learn better when subject to \textit{real-time} feedback loops, for example help from human TAs in a traditional course setting \cite{personalized-feedback, derivation-scoring, human-tutoring}. Since we are concerned with a system designed to work with derivations, this constraint is particularly important; theorem prover calls are expensive computations \cite{bisearch} and often do not complete at sufficiently interactive speeds.
 
 %Interface design is also a concern for these systems. \textit{Oviatt et. al} suggest that as a system departs further from a traditional ``pen and paper" interface, a greater cognitive load is placed upon the student \cite{interface-learning-load}. This again suggests that systems which rely upon simplifications to an assignment's answer domain (e.g. multiple choice, or a single solution field) are not ideal for working through a derivation.
 
@@ -136,7 +136,7 @@ Similarly, students tend to learn better when subject to \textit{real-time} feed
 To address these limitations we present:
 %(e.g. in our Compilers course we use it to assign problems in type checking, regular expressions, finite automata, and many other topics; its generality allows its use in most formal systems).
 \begin{itemize}
-\item \textit{DeduceIt}: A web-based interface which allows instructors to to specify a general class of derivation exercises, 
+\item \textit{DeduceIt}: A web-based system which allows instructors to to specify a general class of derivation exercises, 
 % MSB 4/4: I don't think the _interface_ scales to a large workload. Maybe instead say ``a web-based, interactive derivation system''
 scales to a large workload of students, and enables students to complete assignments at varied levels of abstraction. DeduceIt provides students with constructive and real-time feedback.
 \item The idea of a \textit{proof cache}: A novel data structure which records the history of every attempted derivation, reusing computations from previously derived steps. We show that this cache increases derivation-checking efficiency by 87\% and provides feedback in less than one second, much faster than what is possible in a single user system.

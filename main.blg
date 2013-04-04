@@ -7,45 +7,45 @@ Warning--to sort, need author or key in coursera-doc
 Warning--empty author in coursera-doc
 Warning--empty journal in coursera-doc
 Warning--empty journal in enroll
-You've used 25 entries,
+You've used 26 entries,
             2243 wiz_defined-function locations,
-            666 strings with 7724 characters,
-and the built_in function-call counts, 7378 in all, are:
-= -- 730
-> -- 359
+            673 strings with 7890 characters,
+and the built_in function-call counts, 7655 in all, are:
+= -- 758
+> -- 366
 < -- 0
-+ -- 153
-- -- 124
-* -- 566
-:= -- 1270
-add.period$ -- 74
-call.type$ -- 25
-change.case$ -- 135
++ -- 157
+- -- 126
+* -- 588
+:= -- 1315
+add.period$ -- 77
+call.type$ -- 26
+change.case$ -- 139
 chr.to.int$ -- 0
-cite$ -- 29
-duplicate$ -- 206
-empty$ -- 565
-format.name$ -- 124
-if$ -- 1491
+cite$ -- 30
+duplicate$ -- 214
+empty$ -- 591
+format.name$ -- 126
+if$ -- 1550
 int.to.chr$ -- 0
-int.to.str$ -- 25
-missing$ -- 27
-newline$ -- 127
-num.names$ -- 48
-pop$ -- 109
+int.to.str$ -- 26
+missing$ -- 28
+newline$ -- 132
+num.names$ -- 50
+pop$ -- 111
 preamble$ -- 1
-purify$ -- 112
+purify$ -- 115
 quote$ -- 0
-skip$ -- 132
+skip$ -- 137
 stack$ -- 0
-substring$ -- 479
-swap$ -- 23
+substring$ -- 506
+swap$ -- 24
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 96
+type$ -- 100
 warning$ -- 4
-while$ -- 74
-width$ -- 27
-write$ -- 243
+while$ -- 77
+width$ -- 28
+write$ -- 253
 (There were 4 warnings)
