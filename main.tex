@@ -74,7 +74,7 @@ breaklinks=true,
 % End of preamble. Here it comes the document.
 \begin{document}
 
-\title{Interactive formal reasoning for large online courses}
+\title{Interactive Formal Reasoning for Large Online Courses}
 
 %\numberofauthors{1}
 %\author{
@@ -82,6 +82,15 @@ breaklinks=true,
 %    \affaddr{Stanford University}\\
 %    \email{\{ethan.fast, clee0, aiken, koller, msb, eric\}@cs.stanford.edu}\\
 %}
+
+\numberofauthors{1}
+\author{
+  \alignauthor Anonymized for review\\
+    \affaddr{~}\\
+    \affaddr{~}\\
+    \email{~}\\
+    \affaddr{~}
+}
 
 \maketitle
 
@@ -93,7 +102,10 @@ breaklinks=true,
 \end{figure*}
 
 \begin{abstract}
-Large online courses often assign problems that are gradable by simple checks such as multiple choice, but these checks are inappropriate for domains in which students may arrive at many different valid solutions. One such domain is \emph{derivations}: sequences of logical steps commonly used in assignments for technical, mathematical and scientific subjects. We present DeduceIt, a system for creating and grading derivation assignments across arbitrary formal domains with many valid solutions. DeduceIt supports assignments in any logical formalism, and it allows instructors to specify the level of abstraction at which each assignment may be completed --- students may elide steps which are didactically unimportant to a derivation. The system is scalable and accessible to many thousands of students on the web. DeduceIt benefits from checking many thousands of user derivations: it introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We evaluate DeduceIt with 990 students in an online compilers course, finding that students take advantage of its incremental feedback and that instructors benefit from its structured insights into confusing course topics.
+%Large online courses often assign problems that are gradable by simple checks such as multiple choice, but these checks are inappropriate for domains in which students may arrive at many different valid solutions. One such domain is \emph{derivations}: sequences of logical steps commonly used in assignments for technical, mathematical and scientific subjects. We present DeduceIt, a system for creating and grading derivation assignments across arbitrary formal domains with many valid solutions. DeduceIt supports assignments in any logical formalism, and it allows instructors to specify the level of abstraction at which each assignment may be completed --- students may elide steps which are didactically unimportant to a derivation. The system is scalable and accessible to many thousands of students on the web. DeduceIt benefits from checking many thousands of user derivations: it introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We evaluate DeduceIt with 990 students in an online compilers course, finding that students take advantage of its incremental feedback and that instructors benefit from its structured insights into confusing course topics.
+Large online courses often assign problems that are gradable by simple checks such as multiple choice, but these checks are inappropriate for domains in which students may arrive at an infinity of solutions. One such domain is \emph{derivations}: sequences of logical steps commonly used in assignments for technical, mathematical and scientific subjects. We present DeduceIt, a system for creating and grading derivation assignments across arbitrary formal domains with many valid solutions. DeduceIt supports assignments in any logical formalism, provides students with incremental feedback, and allows instructors to specify the level of abstraction at which each assignment may be completed. DeduceIt benefits from checking thousands of user derivations over the web: it introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We evaluate DeduceIt with 990 students in an online compilers course, finding students take advantage of its incremental feedback and instructors benefit from its structured insights into confusing course topics. Our work suggests that automated reasoning can extend the reach of online assignments and large-scale education to many new domains.
+%Large online courses often assign problems that are gradable by simple checks such as multiple choice, but these checks are inappropriate for domains in which students may arrive at an infinity of possible solutions. One such domain is \emph{derivations}: sequences of logical steps commonly used in assignments for technical, mathematical and scientific subjects. However, derivations can be processed using automated reasoning techniques. We present DeduceIt, a system for creating and grading derivation assignments across arbitrary formal domains with many valid solutions. DeduceIt supports assignments in any logical formalism, gives students incremental feedback on their reasoning, and allows instructors to specify the level of abstraction at which students may complete assignments. DeduceIt benefits from checking thousands of user derivations over the web: it introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We evaluate DeduceIt with 990 students in an online compilers course, finding that students take advantage of its incremental feedback and that instructors benefit from its structured insights into confusing course topics. Our work suggests that automated reasoning can extend the reach of online assignments and large-scale education to many new domains.
+%Large online courses have been limited to assignments that are gradable by simple checks such as multiple choice, which are inappropriate for many domains. In particular, courses in technical, mathematical and scientific subjects often assign derivations, which are characterized by an infinity of possible correct solutions. However, derivations can be processed using automated reasoning techniques. We present DeduceIt, a system for creating and grading derivation assignments across arbitrary formal domains with many valid solutions. DeduceIt supports assignments in any logical formalism, gives students incremental feedback on the correctness of their reasoning, and allows instructors to specify the level of abstraction at which students may complete assignments. DeduceIt benefits from checking many thousands of user derivations over the web: it introduces the idea of a \textit{proof cache}, a novel data structure which leverages a crowd of students to decrease the cost of checking derivations and providing real-time, constructive feedback. We evaluate DeduceIt with 990 students in an online compilers course, finding that students take advantage of its incremental feedback and that instructors benefit from its structured insights into confusing course topics. Our work suggests that automated reasoning can extend the reach of online assignments and large-scale education to many new domains.
 \end{abstract}
 
 \keywords{
@@ -175,12 +187,12 @@ Since our student's previous conclusion is nearly identical to the goal, she wan
 
 She selects ``Commutativity" from the rule input field, selects $((B+A).(B+A)*)+\epsilon$ from the givens field, and submits the step. DeduceIt checks her derivation, infers through proof search that she means to apply Commutativity twice---on the two appropriate sub-expressions---and responds that her derivation is correct. She has completed this assignment.
 
-Here our student \textit{interacts with DeduceIt at a relatively high level of abstraction}: she applies Commutativity twice, simultaneously, in a single derivation step. Under a different assignment setup she might be required to enter each application of Commutativity separately, or in a third kind of assignment setup, DeduceIt might allow her to use Commutativity freely inside the conclusion of any rule application. %DeduceIt allows instructors flexibility in defining these sorts of behaviors. For instance, instructors can specify \textit{free} rules which a student may use at any time, or \textit{required} rules, which must be referenced on every step. Rules may also be \textit{context independent} (like Commutativity in this example) or \textit{context dependent}, which governs where and how broadly a rule might be applied.    %\msb{While this example is clear, it's not exactly an impressive use of the feature. I'd rather see one that allows the student to completely ignore a step (e.g., Commutativity) since it's obvious.}
+Here our student \textit{interacts with DeduceIt at a relatively high level of abstraction}: she applies Commutativity twice, simultaneously, in a single derivation step. Under a different assignment setup she might be required to enter each application of Commutativity separately; or alternatively, she might be allowed to apply Commutativity freely inside the conclusions of other rule applications. %DeduceIt allows instructors flexibility in defining these sorts of behaviors. For instance, instructors can specify \textit{free} rules which a student may use at any time, or \textit{required} rules, which must be referenced on every step. Rules may also be \textit{context independent} (like Commutativity in this example) or \textit{context dependent}, which governs where and how broadly a rule might be applied.    %\msb{While this example is clear, it's not exactly an impressive use of the feature. I'd rather see one that allows the student to completely ignore a step (e.g., Commutativity) since it's obvious.}
 % MSB 4/4: Let's add a sentence about applications of this, to demonstrate its range.
 
 \subsection{Providing Constructive and Real-time Feedback}
 
-In this example, our student knows right away whether the intermediate steps of her derivation are valid. This allows her to move from one step to another with confidence that her prior reasoning is correct. Moreover, had she been running DeduceIt on her own computer, it would have taken as much  as 4 seconds for each piece of feedback. However, because DeduceIt can utilize proof steps that other students computed previously, she receives feedback in less than one second.
+In this example, our student knows right away whether the intermediate steps of her derivation are valid. This allows her to move from one step to another with confidence that her prior reasoning is correct. Moreover, had she been running DeduceIt on her own computer, it would have taken as much  as 4 seconds for each piece of feedback. However, because DeduceIt can utilize proof steps that other students computed previously, she receives feedback in less than one second. 
 
 
 % \subsection{Completing a Derivation}
@@ -244,7 +256,7 @@ Instructors can customize an assignment's language, allowing students to use fam
 
 Note that with several exceptions (the notation specific to rewrites: $:=$, $\rightarrow$, and $\$$) the operators used in expressions have no meaning without an accompanying set of rules; they simply determine the parsing of an expression.
 
-Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by LaTeX. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g., $\backslash{}sin\{x\}$.
+Instructors may add two kinds of syntax to DeduceIt's standard rewrite language: constants and functions. This is convenient in many domains, where familiarly named functions and constants enhance the readability of an assignment. For these custom functions and constants DeduceIt adopts a notation inspired by LaTeX. Constants appear in the language as a symbol value preceded by a backslash, e.g $\backslash{}e$. Functions look much the same, except they have arguments which they accept in brackets, e.g., $\backslash{}sin\{x\}$. \\
 
 \subsubsection{Defining an Assignment Domain with Rulesets}
 
@@ -338,7 +350,7 @@ For example, suppose we give DeduceIt the assumption $a$, the rewrite rule $a \r
 
 In practice, DeduceIt conducts one round of forward search and one round of backward search; the two rounds of search then meet in the middle, i.e., they check for terms generated in common. We introduce backward search to ensure DeduceIt will correctly check rewrite languages which allow the introduction of new symbols, e.g., predicate logic and the rule $\$a \rightarrow \$a \vee \$b$ (note here that $\$b$ is a variable in the rewrite rule which binds to \textit{any expression}, so forward search cannot enumerate every possible value of $\$b$). Moreover, the meet-in-the-middle approach tends to be more effective than two rounds of only forward or backward search \cite{bisearch}.
 
-We find the system is limited to two rounds of search under reasonable time constraints, with an upper bound of 4 seconds for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. Notably, this delay falls into the third classification of Nielsen's work on response times, beneath the ten-second limit for keeping a user focused on his or her dialog with the system \cite{neilsen}. While the theorem prover could be made more efficient, the next section will demonstrate that in many cases this is unneccessary.
+We find the system is limited to two rounds of search under reasonable time constraints, with an upper bound of 4 seconds for students interacting with a web application. At each iteration of search DeduceIt applies the set of available rewrite rules---defined by the collection of rulesets---non-deterministically and exhaustively. Notably, this delay falls into the third classification of Nielsen's work on response times, beneath the ten-second limit for keeping a user focused on his or her dialog with the system \cite{neilsen}. While the theorem prover could be made more efficient, the next section will demonstrate that in many cases this is unnecessary.
 
 \subsection{Proof Cache}
 
@@ -366,7 +378,7 @@ In this section we provide evidence for two claims:
   \item \textit{DeduceIt provides instructors with insights that translate into future course improvements}. Here we provide examples from our experience with the Compilers course. 
 \end{enumerate}
   
-We run several analyses over ten DeduceIt assignments, measuring the distribution of students' time spent on assignments and derivation steps, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache.
+We run several analyses over ten DeduceIt assignments, measuring the distribution of students' time spent on assignments and derivation steps, the success rate of students, the average number of student errors, and the performance impact of the DeduceIt's proof cache. 
 
 \subsection{Assignment Time Distributions}
 \begin{figure}[tb]
@@ -407,7 +419,7 @@ We run several analyses over ten DeduceIt assignments, measuring the distributio
   \label{tab:table1}
 \end{table*}
 
-First, we analyze the amount of time students spent on each assignment. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty (Figure~\ref{fig:distributions}). For example, in the \textit{Rightmost Derivation} assignment students are clustered around $4$ minutes, and in the \textit{Shift-Reduce Parsing} assignment they are clustered around $10$ minutes; the \textit{Rightmost Derivation} assignment is generally considered easier by students than \textit{Shift-Reduce Parsing}. This relation holds true among the remainder of the assignments. To determine assignment difficulty in traditional courses, instructors would typically need to guess or to ask students, who may have faulty recall.
+First, we analyze the amount of time students spent on each assignment. These time distributions are approximately normal with right skew and centered upon a fixed time value which tracks loosely with an assignment's difficulty (Figure~\ref{fig:distributions}). For example, in the \textit{Rightmost Derivation} assignment students are clustered around $4$ minutes, and in the \textit{Shift-Reduce Parsing} assignment they are clustered around $10$ minutes; the \textit{Rightmost Derivation} assignment is generally considered easier by students than \textit{Shift-Reduce Parsing}. This relation holds true among the remainder of the assignments. To determine assignment difficulty in traditional courses, instructors would typically need to guess or to ask students, who may have faulty recall. \\
 
 \subsection{Rule Time Distributions}
 
@@ -454,10 +466,9 @@ Further, the proof cache has benefits over memoization in a single user system. 
 % \subsection{System Performance}
 % 
 % In the final experiment, we measure the relation between system latency and load. Since a MOOC will typically enroll thousands of students, it is important that DeduceIt maintain responsiveness when visited concurrently by many users. Our analytics show DeduceIt receives one incoming request per minute on average. However, at peak load---usually associated with an assignment deadline---the application may receive up to $X$ incoming requests per minute. Since DeduceIt runs on a cloud provider, we can add necessary resources on demand to handle this additional traffic. Over the length of the course, DeduceIt's average latency was $900ms$, which corresponds to the second level of Neilsen's hierarchy of responsiveness \cite{neilsen}.
-
 \section{Limitations and Future Work}
 
-In our Compilers course we encountered several notable limitations of the DeduceIt system: 
+In our Compilers course we encountered several notable limitations of the DeduceIt system:
 
 First, a DeduceIt assignment must adopt the syntax of the default rewrite language. This works well for many kinds of assignments (e.g., algebra, basic calculus, predicate logic, regular expressions, and type checking), since instructors can still define custom functions and constants. However, in some assignments, natural notation differs more considerably from DeduceIt's rewrite language (and its possible extensions); this creates unnecessary friction on the derivation interface. For example, \textit{LL(1) Parsing} uses a series of rules to define a lookup table: one student commented that some such rules were defined in ``less than ideal notation.'' %Another told us, ``[the system] is difficult to use since you have to learn the syntax of each problem before actually applying what you know.'' 
 
@@ -471,7 +482,7 @@ Third, student interactions are constrained by proof search. Although instructor
 
 Fourth, although DeduceIt's proof cache provides a dramatic performance benefit, there are several ways the design of the cache can be improved. For instance, changing the cache representation from a tree into a directed acyclic graph (DAG) would be faster and more space efficient. Likewise, collapsing semantically equivalent derivation steps would also make lookups faster and improve the cache hit rate.
 
-Finally, this paper does not directly address DeduceIt's effect on teaching outcomes: that is, how the system compares with traditional educational tools, and how it impacts student learning. We hope to study this question in future work.
+Finally, this paper does not directly address DeduceIt's effect on teaching outcomes: that is, how the system compares with traditional educational tools, and how it impacts student learning. We hope to study this question in future work. 
 
 %reading long formulas in the short text fields is comparable to running up a pretty steep hill
 
