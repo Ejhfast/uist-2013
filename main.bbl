@@ -21,6 +21,11 @@ Bravenboer, M., van Dam, A., Olmos, K., and Visser, E.
 \newblock Program transformation with scoped dynamic rewrite rules.
 \newblock {\em Fundam. Inf. 69}, 1-2 (2005), 123--178.
 
+\bibitem{burstall}
+Burstall, R.
+\newblock Proveeasy: Helping people learn to do proofs.
+\newblock {\em In Proc. ENTCS 2000\/} (2000), 16 -- 32.
+
 \bibitem{grade-programs}
 Cheang, B., Kurnia, A., Lim, A., and Oon, W.-C.
 \newblock On automated grading of programming assignments in an academic
@@ -32,6 +37,11 @@ Clavel, M., Dur{\'a}n, F., Eker, S., Lincoln, P., Mart{\'\i}-Oliet, N.,
   Meseguer, J., and Quesada, J.
 \newblock Maude as a metalanguage.
 \newblock {\em In Proc. WRLA 1998 15\/} (1998).
+
+\bibitem{k-tracing}
+Corbett, A., and Anderson, J.
+\newblock Knowledge tracing: Modeling the acquisition of procedural knowledge.
+\newblock {\em In Proc. UMUAI 1994\/} (1994), 253--278.
 
 \bibitem{personalized-feedback}
 Gallien, T., and Oomen-Early, J.
@@ -45,6 +55,12 @@ Hearst, M.
 \newblock The debate on automated essay grading.
 \newblock {\em Intelligent Systems and their Applications, IEEE 15}, 5 (2000),
   22--37.
+
+\bibitem{MTT}
+Heffernan, N.~T., Koedinger, K.~R., and Razzaq, L.
+\newblock Expanding the model-tracing architecture: A 3rd generation
+  intelligent tutor for algebra symbolization.
+\newblock {\em Int. J. Artif. Intell. Ed.\/} (2008), 153--178.
 
 \bibitem{auto-grade}
 Hernan-Losada, I., Pareja-Flores, C., and Velazquez-Iturbide, A.
@@ -79,6 +95,12 @@ Kulkarni, C., Pang, K., Le, H., Chia, D., Papadopoulos, K., Cheng, J., Koller,
   D., and Klemmer, S.
 \newblock Peer and self assessment in massive online design classes.
 \newblock {\em ACM TOCHI (in submission)\/} (2013).
+
+\bibitem{lapets}
+Lapets, A., Skowyra, R., Bassem, C., Kfoury, A., and Bestavros, A.
+\newblock Towards an infrastructure for integrated accessible formal reasoning
+  environments.
+\newblock {\em In Proc. UITP 2012\/}.
 
 \bibitem{crowd-snippets}
 Lieber, T., and Miller, R.
@@ -117,6 +139,11 @@ Paulson, L.~C.
 \newblock The foundation of a generic theorem prover.
 \newblock {\em Journal of Automated Reasoning 5\/} (1989).
 
+\bibitem{its}
+Ritter, S., Towle, B., Murray, R., Hausmann, R., and Connelly, J.
+\newblock A cognitive tutor for geometric proof.
+\newblock {\em In Prof. ITS 2010\/} (2010), 453--453.
+
 \bibitem{moss}
 Schleimer, S., Wilkerson, D.~S., and Aiken, A.
 \newblock Winnowing: local algorithms for document fingerprinting.
@@ -143,5 +170,11 @@ VanLehn, K.
 \newblock The relative effectiveness of human tutoring, intelligent tutoring
   systems, and other tutoring systems.
 \newblock {\em Educational Psychologist 46}, 4 (2011), 197--221.
+
+\bibitem{theorema}
+Windsteiger, W.
+\newblock Theorema 2.0: A graphical user interface for a mathematical assistant
+  system.
+\newblock {\em CEUR Workshop Proceedings\/} (2012), 73--81.
 
 \end{thebibliography}

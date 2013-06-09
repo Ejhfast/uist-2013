@@ -6,46 +6,47 @@ Database file #1: actual.bib
 Warning--to sort, need author or key in coursera-doc
 Warning--empty author in coursera-doc
 Warning--empty journal in coursera-doc
+Warning--empty year in lapets
 Warning--empty journal in enroll
-You've used 26 entries,
+You've used 32 entries,
             2243 wiz_defined-function locations,
-            673 strings with 7890 characters,
-and the built_in function-call counts, 7655 in all, are:
-= -- 758
-> -- 366
+            703 strings with 8816 characters,
+and the built_in function-call counts, 9562 in all, are:
+= -- 947
+> -- 463
 < -- 0
-+ -- 157
-- -- 126
-* -- 588
-:= -- 1315
-add.period$ -- 77
-call.type$ -- 26
-change.case$ -- 139
++ -- 198
+- -- 160
+* -- 730
+:= -- 1642
+add.period$ -- 95
+call.type$ -- 32
+change.case$ -- 174
 chr.to.int$ -- 0
-cite$ -- 30
-duplicate$ -- 214
-empty$ -- 591
-format.name$ -- 126
-if$ -- 1550
+cite$ -- 37
+duplicate$ -- 262
+empty$ -- 735
+format.name$ -- 160
+if$ -- 1939
 int.to.chr$ -- 0
-int.to.str$ -- 26
-missing$ -- 28
-newline$ -- 132
-num.names$ -- 50
-pop$ -- 111
+int.to.str$ -- 32
+missing$ -- 34
+newline$ -- 162
+num.names$ -- 62
+pop$ -- 136
 preamble$ -- 1
-purify$ -- 115
+purify$ -- 144
 quote$ -- 0
-skip$ -- 137
+skip$ -- 172
 stack$ -- 0
-substring$ -- 506
-swap$ -- 24
+substring$ -- 644
+swap$ -- 30
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 100
-warning$ -- 4
-while$ -- 77
-width$ -- 28
-write$ -- 253
-(There were 4 warnings)
+type$ -- 124
+warning$ -- 5
+while$ -- 96
+width$ -- 34
+write$ -- 312
+(There were 5 warnings)
