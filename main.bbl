@@ -43,6 +43,12 @@ Corbett, A., and Anderson, J.
 \newblock Knowledge tracing: Modeling the acquisition of procedural knowledge.
 \newblock {\em In Proc. UMUAI 1994\/} (1994), 253--278.
 
+\bibitem{locusoffeedback}
+Corbett, A.~T., and Anderson, J.~R.
+\newblock Locus of feedback control in computer-based tutoring: impact on
+  learning rate, achievement and attitudes.
+\newblock In {\em Proc. CHI '01} (2001).
+
 \bibitem{personalized-feedback}
 Gallien, T., and Oomen-Early, J.
 \newblock Personalized versus collective instructor feedback in the online
