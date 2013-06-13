@@ -1,0 +1,7 @@
+We incorporated the related work suggested by R7, R5, and R1, contrasting it with DeduceIt, and we also reframed related work as suggested by reviewers.
+
+We revised the "Introduction" section and reorganized the "DeduceIt" section to better highlight novel research and interface contributions, and where applicable we added further discussion of these contributions.
+
+We added discussion of assignment creation.
+
+We added discussion of the tradeoffs associated with DeduceIt's approach to supporting formal domains.
