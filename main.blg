@@ -10,7 +10,7 @@ Warning--empty year in lapets
 Warning--empty journal in enroll
 You've used 31 entries,
             2243 wiz_defined-function locations,
-            694 strings with 8656 characters,
+            694 strings with 8640 characters,
 and the built_in function-call counts, 9136 in all, are:
 = -- 897
 > -- 441
