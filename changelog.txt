@@ -4,4 +4,4 @@ We revised the "Introduction" section and reorganized the "DeduceIt" section to 
 
 We added discussion of assignment creation.
 
-We added discussion of the tradeoffs associated with DeduceIt's approach to supporting formal domains.
+We added discussion of the tradeoffs associated with DeduceIt's approach to supporting arbitrary formal domains.
