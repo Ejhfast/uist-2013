@@ -16,11 +16,6 @@ Bennett, R.~E., Steffen, M., Singley, M.~K., Morley, M., and Jacquemin, D.
   measuring mathematical reasoning in computer-adaptive tests.
 \newblock {\em Journal of Educational Measurement 34}, 2 (1997), pp. 162--176.
 
-\bibitem{dynamic-rules}
-Bravenboer, M., van Dam, A., Olmos, K., and Visser, E.
-\newblock Program transformation with scoped dynamic rewrite rules.
-\newblock {\em Fundam. Inf. 69}, 1-2 (2005), 123--178.
-
 \bibitem{burstall}
 Burstall, R.
 \newblock Proveeasy: Helping people learn to do proofs.
@@ -107,12 +102,6 @@ Lapets, A., Skowyra, R., Bassem, C., Kfoury, A., and Bestavros, A.
 \newblock Towards an infrastructure for integrated accessible formal reasoning
   environments.
 \newblock {\em In Proc. UITP 2012\/}.
-
-\bibitem{crowd-snippets}
-Lieber, T., and Miller, R.
-\newblock Programming with everybody: tightening the copy-modify-publish
-  feedback loop.
-\newblock {\em In UIST Adjunct Proceedings 2012\/} (2012), 101--102.
 
 \bibitem{rewriting-logic}
 Martí-Oliet, N., and Meseguer, J.
